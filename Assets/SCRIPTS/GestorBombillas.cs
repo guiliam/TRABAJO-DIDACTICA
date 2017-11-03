@@ -29,10 +29,10 @@ public class GestorBombillas : MonoBehaviour {
 			if (actualLvl > 2)
 				HardcodedLvls [actualLvl - 2].SetActive (false);
 		} else {
-			if (Random.value < 0.5)
+			/*if (Random.value < 0.5)
 				MetodoCristian();
 			else
-				MetodoJapend ();
+				MetodoJapend ();*/
 		}
 	}
 
@@ -40,7 +40,7 @@ public class GestorBombillas : MonoBehaviour {
 		for (int i = 0; i < numeroBombillas; i++) {
 			Bombillas [i] = Instantiate (PrefabBombilla);
 		}
-		int numBombillasPrimerBoton = Mathf.Round(numeroBombillas / 2);
+		int numBombillasPrimerBoton = (int) Mathf.Round(numeroBombillas / 2);
 
 
 	}
@@ -62,13 +62,13 @@ public class GestorBombillas : MonoBehaviour {
 			enlazarBombillasABoton (i, bombillasAEnlazar);
 		}
 
-		List<int> aux = new List<int>;
+		List<int> aux = new List<int>();
 		for (int i = 0; i < encendidas.Length; i++) {
 			if(encendidas[i])
 				aux.Add(i);
 		}
 
-		bombillasAEnlazar = aux.ToArray;
+		bombillasAEnlazar = aux.ToArray();
 		enlazarBombillasABoton(numeroBotones-1, bombillasAEnlazar);
 	}
 
