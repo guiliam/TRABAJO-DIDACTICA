@@ -10,7 +10,7 @@ public class CinematicaFinal : MonoBehaviour {
 	public Text texto, bocadilloTexto;
 	public string[] frases;
 	public GameObject PersonajeEntero;
-	public GameObject Hoja, BocadilloTexto;
+	public GameObject Hoja, BocadilloTexto, bombilla;
 	private AudioSource audio;
 	private int contador = 0;
 	private float tiempo;
@@ -29,6 +29,15 @@ public class CinematicaFinal : MonoBehaviour {
 			if (contador == 11) {
 				BocadilloTexto.SetActive (true);
 			}
+
+			if (contador == 2) {
+				bombilla.SetActive (true);
+			}
+
+			if (contador == 3) {
+				bombilla.SetActive (false);
+			}
+
 
 			if (contador > 12) {
 				Application.Quit ();
