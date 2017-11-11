@@ -26,7 +26,7 @@ public struct Pair<T>
 public struct Secuencia
 {
     /*
-     * Almacena todas las palabras de cada secuencia. Las parejas validas sona las correspondientes a los indices entre 0 y'parejas' (sin incluirlo)
+     * Almacena todas las palabras de cada secuencia. Las parejas validas sona las correspondientes a los indices entre 0 y'parejas' (incluido)
      * es decir, si nombres y verbos tienen una longitud de 5 y parejas = 3, las parejas validas seran (0,0), (1,1) y (2,2). el resto de combinaciones no seran validas 
      */
 

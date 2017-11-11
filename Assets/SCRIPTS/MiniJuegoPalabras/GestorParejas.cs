@@ -10,10 +10,10 @@ public class GestorParejas : MonoBehaviour {
     public float incrementoX, incrementoY;
     public int numeroPanelesPorFila;
 
-
+    bool panelCogido; //inica si hay un panel cogido
     SecuenciasAcciones secuencias;
     Secuencia secuenciaActiva;
-    int indiceSecuenciaActiva;
+    int indiceSecuenciaActiva; //indica por que pareja de la secuancia vamos
 
     //paneles base
     GameObject soporteNombre;
@@ -24,6 +24,9 @@ public class GestorParejas : MonoBehaviour {
     //paneles activos
     List<GameObject> panelesNombresActivos;
     List<GameObject> panelesVerbosActivos;
+
+    //panel que se esta llevando
+    GameObject carrying;
 
 	// Use this for initialization
 	void Awake () {
@@ -46,18 +49,64 @@ public class GestorParejas : MonoBehaviour {
 
         cargarSecuencia();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    public bool ComprobarPareja(GameObject obj1)
+    {
+        print(carrying.transform.GetChild(0).GetComponent<Text>().text + obj1.transform.GetChild(0).GetComponent<Text>().text);
+        if (carrying.GetComponent<MovimientoPalabra>().palabra)
+        {
+            if (carrying.transform.GetChild(0).GetComponent<Text>().text == secuenciaActiva.nombres[indiceSecuenciaActiva] && obj1.transform.GetChild(0).GetComponent<Text>().text == secuenciaActiva.verbos[indiceSecuenciaActiva])
+            {
+                //si la pareja es correcta
+
+                //borramos de la lista
+                panelesNombresActivos.Remove(carrying);
+                panelesVerbosActivos.Remove(obj1);
+                GameObject.Destroy(carrying);
+                GameObject.Destroy(obj1);
+                panelCogido = false;
+                carrying = null;
+                indiceSecuenciaActiva++;
+                return true;
+            }
+        }
+        else
+        {
+
+            if (obj1.transform.GetChild(0).GetComponent<Text>().text == secuenciaActiva.nombres[indiceSecuenciaActiva] && carrying.transform.GetChild(0).GetComponent<Text>().text == secuenciaActiva.verbos[indiceSecuenciaActiva])
+            {
+                //si la pareja es correcta
+
+                //borramos de las listas
+                panelesNombresActivos.Remove(obj1);
+                panelesVerbosActivos.Remove(carrying);
+
+                GameObject.Destroy(carrying);
+                GameObject.Destroy(obj1);
+                panelCogido = false;
+                carrying = null;
+                indiceSecuenciaActiva++;
+                return true;
+            }
+
+        }
+
+        return false;
+        //comprueba si la pareja introducida es la que se esperaba
+        /*if (nombre.GetComponent<Text>().text == secuenciaActiva.nombres[indiceSecuenciaActiva] && verbo.GetComponent<Text>().text == secuenciaActiva.verbos[indiceSecuenciaActiva])
+        {
+            //si la pareja es correcta
+            indiceSecuenciaActiva++;
+            return true;
+        }*/
+    }
 
     void cargarSecuencia()
     {
         GameObject aux;
 
         //generar paneles para los nombres
-        for(int i = 0; i < secuenciaActiva.nombres.Length; i++)
+        for (int i = 0; i < secuenciaActiva.nombres.Length; i++)
         {
             //si el soporte ya existe, se actualiza el texto
             if (i < panelesNombresActivos.Count)
@@ -107,7 +156,7 @@ public class GestorParejas : MonoBehaviour {
 
             panelesVerbosActivos[i].transform.localPosition = new Vector3(xInicial + (i % numeroPanelesPorFila * incrementoX),
                                                         yInicialVerbos - (incrementoY * (i / numeroPanelesPorFila)), -2f);
-                                                                   
+
         }
 
         //si han sobrado paneles, se desactivan
@@ -115,6 +164,41 @@ public class GestorParejas : MonoBehaviour {
         {
             panelesVerbosActivos[i].SetActive(false);
         }
+    }
 
+
+    public List<GameObject> GetNombres()
+    {
+        return panelesNombresActivos;
+    }
+
+
+    public List<GameObject> GetVerbos()
+    {
+        return panelesVerbosActivos;
+    }
+
+    public void SetPanelCogido(bool valor, GameObject obj)
+    {
+        if (valor && panelCogido)
+        {
+            print("Error en set panel cogido: se ha intentado coger cuando ya habia un panel cogido");
+        }
+
+        else
+        {
+            panelCogido = valor;
+            carrying = obj;
+        }
+    }
+
+    public bool GetPanelCogido()
+    {
+        return panelCogido;
+    }
+
+    public GameObject GetCarriying()
+    {
+        return carrying;
     }
 }
