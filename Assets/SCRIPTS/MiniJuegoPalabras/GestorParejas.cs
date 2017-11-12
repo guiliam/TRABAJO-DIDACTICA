@@ -138,6 +138,7 @@ public class GestorParejas : MonoBehaviour {
                 panelesNombresActivos[i].GetComponentInChildren<Text>().text = secuenciaActiva.nombres[i];
                 panelesNombresActivos[i].SetActive(true);
                 panelesNombresActivos[i].GetComponent<MovimientoPalabra>().Liberar();
+                panelesNombresActivos[i].transform.GetChild(1).gameObject.SetActive(false);
             }
 
             //si no existe, se crea uno nuevo 
@@ -172,6 +173,7 @@ public class GestorParejas : MonoBehaviour {
                 panelesVerbosActivos[i].GetComponentInChildren<Text>().text = secuenciaActiva.verbos[i];
                 panelesVerbosActivos[i].SetActive(true);
                 panelesVerbosActivos[i].GetComponent<MovimientoPalabra>().Liberar();
+                panelesVerbosActivos[i].transform.GetChild(1).gameObject.SetActive(false);
             }
 
             //si no existe, se crea uno nuevo 
