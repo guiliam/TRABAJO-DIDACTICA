@@ -7,12 +7,15 @@ public class MovimientoPalabra : MonoBehaviour {
     private const float DISTANCE_TO_CAMERA = 7.5f;
     private const float DISTANCE_STICK = 5f;
     private const float OFFSET_POSICION = 20;
+    private const float VELOCIDAD_VUELTA = 50f;
+    private const float MARGEN_POSICION_INICIAL = 0.1f;
 
     public bool palabra;
 
     GestorParejas gestor;
     bool cogido;
     GameObject candidato; //objeto con el que se intentara unir
+    Vector3 posInicial;
 
 
 	// Use this for initialization
@@ -22,6 +25,7 @@ public class MovimientoPalabra : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+        //si esta cogido
         if (cogido)
         {
             //movemos con el raton
@@ -39,15 +43,26 @@ public class MovimientoPalabra : MonoBehaviour {
             //recorremos posibles puntos y buscamos el mas cercano
             foreach (GameObject obj in lista)
             {
-                aux = Vector3.Distance(obj.transform.transform.position, transform.position);
-                //si esta lo bastante cerca, se pega
-                if ( aux <= DISTANCE_STICK)
+                if (lista[lista.IndexOf(obj)].active)
                 {
-                    //si ya habia un candidato, se coge el mas ceracno
-                    if (aux < distanciaCandidato)
+                    aux = Vector3.Distance(obj.transform.transform.position, transform.position);
+                    //si esta lo bastante cerca, se pega
+                    if (aux <= DISTANCE_STICK)
                     {
-                        candidato = obj;
-                        distanciaCandidato = aux;
+                        //si ya habia un candidato, se coge el mas ceracno
+                        if (aux < distanciaCandidato)
+                        {
+                            candidato = obj;
+                            distanciaCandidato = aux;
+                            //activamos highlight
+                            obj.transform.GetChild(1).gameObject.SetActive(true);
+                        }
+                        else //desactivamos highlight
+                            obj.transform.GetChild(1).gameObject.SetActive(false);
+                    }
+                    else//desactivamos highlight
+                    {
+                        obj.transform.GetChild(1).gameObject.SetActive(false);
                     }
                 }
             }
@@ -64,6 +79,18 @@ public class MovimientoPalabra : MonoBehaviour {
                 }
             }
         }
+
+        //si no esta cogido, vuelve a su posicion
+        else
+        {
+            if (Vector3.Distance(this.transform.position, posInicial) > MARGEN_POSICION_INICIAL)
+            {
+                Vector3 direccion = Vector3.Normalize(posInicial - transform.position);
+                transform.position += direccion * VELOCIDAD_VUELTA * Time.fixedDeltaTime * (Vector3.Distance(this.transform.position, posInicial) / VELOCIDAD_VUELTA);
+
+            }
+
+        }
 	}
 
 
@@ -73,6 +100,7 @@ public class MovimientoPalabra : MonoBehaviour {
         if (!cogido && !gestor.GetPanelCogido())
         {
             cogido = true;
+            this.gameObject.transform.GetChild(1).gameObject.SetActive(true);
             gestor.SetPanelCogido(true, this.gameObject);
         }
 
@@ -80,6 +108,7 @@ public class MovimientoPalabra : MonoBehaviour {
         else if(cogido && gestor.GetPanelCogido())
         {
             cogido = false;
+            this.gameObject.transform.GetChild(1).gameObject.SetActive(false);
             gestor.SetPanelCogido(false, null);
             /*if (palabra)
             {
@@ -106,5 +135,15 @@ public class MovimientoPalabra : MonoBehaviour {
                 return;
         }
 
+    }
+
+    public void Liberar()
+    {
+        cogido = false;
+    }
+
+    public void SetPosInicial(Vector3 pos)
+    {
+        posInicial = pos;
     }
 }
