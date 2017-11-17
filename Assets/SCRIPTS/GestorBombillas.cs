@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GestorBombillas : MonoBehaviour {	
 	public GameObject[] Niveles;
 	public string[] FrasesRey;
-	public GameObject CanvasNivelCompletado;
+	public GameObject CanvasNivelCompletado, CanvasFinal;
 	public Text TextRey, TextNivelesCompletados;
 
 	Transform[] Bombillas;
@@ -16,7 +16,7 @@ public class GestorBombillas : MonoBehaviour {
 	Vector3[] posicionesBombillasVector;
 	Vector3[] posicionesBotonesVector;
 	int nivelActual, bombillasActivas;
-	bool completado;
+	bool completado, finDelJuego;
 	float timeAux;
 
 	void Awake(){
@@ -31,10 +31,21 @@ public class GestorBombillas : MonoBehaviour {
 		if (completado) {
 			timeAux += Time.deltaTime;
 		}
-		if(timeAux > 3){
+		if(timeAux > 3 && !finDelJuego){
 			timeAux = 0;
 			nivelActual++;
-			inicializarSiguienteNivel ();}
+			if (nivelActual < Niveles.Length)
+				inicializarSiguienteNivel ();
+			else {
+				finDelJuego = true;
+			}
+		}
+		if (finDelJuego) {
+			CanvasFinal.SetActive (true);
+			timeAux += Time.deltaTime;
+			if (timeAux >= 4)
+				Application.LoadLevel ("UnirPalabras");
+		}
 	}
 
 	Transform[] desordenar(Transform[] value)
@@ -56,7 +67,7 @@ public class GestorBombillas : MonoBehaviour {
 	}
 
 	void inicializarSiguienteNivel(){
-		TextNivelesCompletados.text = "Generadores activados:\n" + nivelActual + "/10";
+		TextNivelesCompletados.text = "GENERADORES ACTIVADOS:\n" + nivelActual + "/10";
 		TextRey.text = FrasesRey [nivelActual];
 		CanvasNivelCompletado.SetActive (false);
 		bombillasActivas = 0;
