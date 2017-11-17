@@ -53,6 +53,16 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     private int numeroDeVariables;
     private bool operadoresReducidos; //decide si podran usarse operadores como +=, -=, etc.
 
+    int tabuladores;
+    string lineaActual;
+
+    //variables que definen el codigo que va a generarase
+    int maxLineas,
+        condiciones,
+        buclesWhile,
+        buclesFor;
+    bool elsePendiente;
+
     #region VARIABLES UNITY
     Text soporteCodigo;
     #endregion
@@ -61,6 +71,8 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     List<char> identificadoresVariables = new List<char>();
     List<int> valoresVariables = new List<int>();
 
+    //almacena el codigo creado
+    List<operacion> operaciones = new List<operacion>();
 
 
 
@@ -70,43 +82,77 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         soporteCodigo = GameObject.Find("SoporteCodigo").GetComponent<Text>();
         inicializarVariablesRelacionadasConCodigo();
         dificultad = MUY_FACIL;
-        establecerParametrosSegunDificultad();
         decidirCodigo();
+        generarLineasCodigo();
     }
 
     #endregion
 
 
-
-    void establecerParametrosSegunDificultad()
-    {
-        switch (dificultad)
-        {
-            case MUY_FACIL:
-                operadoresAdmitidos = 2;
-                numeroDeVariables = 10;
-                break;
-        }
-
-    }
-
     private void decidirCodigo()
     {
         //decide cuantas lineas (APROXIMADAMENTE EN EL CASO DE LOS BUCLES) habra
-        int maxLineas = (dificultad + 1) * 3;
+        maxLineas = (dificultad + 1) * 3;
         maxLineas = (int) Mathf.Ceil(maxLineas * UnityEngine.Random.Range(dificultad, maxLineas));
 
         //se generan las variables
         obtenerVariables();
 
-        for (int iterador = 0; iterador < maxLineas; iterador++)
+        //decidimos que aparecera en el codigo segun la dificultad
+        switch (dificultad)
         {
+            case MUY_FACIL:
+                operadoresAdmitidos = 3;
+                numeroDeVariables = 1;
+                operadoresReducidos = false;
+                break;
+
+            case FACIL:
+                operadoresAdmitidos = 3;
+                numeroDeVariables = 2;
+                operadoresReducidos = true;
+                break;
+
+            case MEDIO:
+                //generamos condiciones
+                operadoresReducidos = true;
+                condiciones = UnityEngine.Random.Range(1, 3);
+                break;
+
+            case MEDIO_DIFICIL:
+                break;
+
+            case DIFICIL:
+                break;
+
+            case MUY_DIFICIL:
+                break;
+
         }
     }
 
     private void generarLineasCodigo()
     {
+        int maximo = dificultad - 1;
+        if (maximo < 0) maximo = 0;
+        int seleccion = 0;
 
+        obtenerVariables();
+        
+
+        for (int iterador = 0; iterador < maxLineas; iterador++)
+        {
+            print("generandoLinea" + maximo);
+            seleccion = UnityEngine.Random.Range(0, maximo);
+
+            switch (seleccion)
+            {
+                case 0: //linea normal
+                    generarLineaNormal();
+                    break;
+            }
+
+        }
 
     }
 
@@ -161,6 +207,47 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         }
     }
 
+    private void generarLineaNormal()
+    {
+        print("Generando linea normal");
+        int operador = UnityEngine.Random.Range(0, operadoresAdmitidos);
+        float auxRand = 0;
+
+        if (operadoresReducidos)
+        {
+            auxRand = UnityEngine.Random.value;
+        }
+        else
+        {
+            auxRand = 1;
+        }
+
+
+        if (auxRand < 0.5)
+        {
+            soporteCodigo.text += operacionSimple(identificadoresVariables[UnityEngine.Random.Range(0, numeroDeVariables - 1)],
+                OPERADORES[UnityEngine.Random.Range(0, operadoresAdmitidos - 1)],
+                UnityEngine.Random.Range(0, 10));
+
+        }
+
+        else
+        {
+            if (UnityEngine.Random.value > 0.5f)
+            {
+                soporteCodigo.text +=  operacionSimpleSinOperadoresContraidosPrimeroValor(identificadoresVariables[UnityEngine.Random.Range(0, numeroDeVariables - 1)],
+                OPERADORES[UnityEngine.Random.Range(0, operadoresAdmitidos - 1)],
+                UnityEngine.Random.Range(0, 10));
+            }
+            else
+            {
+                soporteCodigo.text +=  operacionSimpleSinOperadoresContraidosPrimeroVariable(identificadoresVariables[UnityEngine.Random.Range(0, numeroDeVariables - 1)],
+                OPERADORES[UnityEngine.Random.Range(0, operadoresAdmitidos - 1)],
+                UnityEngine.Random.Range(0, 10));
+            }
+        }
+    }
+
     private void inicializarVariablesRelacionadasConCodigo()
     {
         identificadoresVariables.Clear();
@@ -171,29 +258,39 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
     #region GENERADORES LINEAS
 
+    private string tabular()
+    {
+        string cadena = "";
+        for (int i = 0; i < tabuladores; i++)
+        {
+            cadena += "\t";
+        }
+        return cadena;
+    }
+
     private string declaracionVariable(char var, int valor)
     {
-        return var + " = " + Convert.ToString(valor) + ';';
+        return tabular() + var + " = " + Convert.ToString(valor) + "; \n";
     }
 
     private string asignacion(char var1, char var2)
     {
-        return var1 + " = " + var2 + ';';
+        return tabular() +  var1 + " = " + var2 + "; \n";
     }
 
     private string operacionSimpleSinOperadoresContraidosPrimeroVariable(char var, char operador, int valor)
     {
-        return var + " = " + var + " " + operador + " " + Convert.ToString(valor) + ';';
+        return tabular() +  var + " = " + var + " " + operador + " " + Convert.ToString(valor) + "; \n";
     }
 
     private string operacionSimpleSinOperadoresContraidosPrimeroValor(char var, char operador, int valor)
     {
-        return var + " = " + Convert.ToString(valor) + " " + operador + " " + var + ';';
+        return tabular() + var + " = " + Convert.ToString(valor) + " " + operador + " " + var + "; \n";
     }
 
     private string operacionSimple(char var, char operador, int valor)
     {
-        return var + operador + "= " + Convert.ToString(valor) + ';';
+        return tabular() + var + operador + "= " + Convert.ToString(valor) + "; \n";
     }
 
     #endregion
