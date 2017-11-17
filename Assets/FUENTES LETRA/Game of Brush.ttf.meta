@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 299dc75c9902c84439f777c40d9b8a8e
+timeCreated: 1509709523
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Game of Brush
+  fontNames:
+  - Game of Brush
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

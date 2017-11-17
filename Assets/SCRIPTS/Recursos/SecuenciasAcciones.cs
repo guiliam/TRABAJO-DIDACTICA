@@ -26,8 +26,8 @@ public struct Pair<T>
 public struct Secuencia
 {
     /*
-     * Almacena todas las palabras de cada secuencia. Las parejas validas sona las correspondientes a los indices entre 0 y'parejas' (sin incluirlo)
-     * es decir, si nombres y verbos tienen una longitud de 5 y parejas = 3, las parejas validas seran (0,0), (1,1) y (2,2). el resto de combinaciones no seran validas 
+     * Almacena todas las palabras de cada secuencia. Las parejas validas sona las correspondientes a los indices entre 0 y'parejas' (incluido)
+     * es decir, si nombres y verbos tienen una longitud de 5 y parejas = 3, las parejas validas seran (0,0), (1,1), (2,2) y (3,3). el resto de combinaciones no seran validas 
      */
 
     public string[] nombres;
@@ -47,8 +47,19 @@ public class SecuenciasAcciones{
 
     static SecuenciasAcciones instanciaActiva;
 
-    public Secuencia[] secuencias = new Secuencia[]
+    public Secuencia[] Secuencias = new Secuencia[]
         {
+            //tirar palanca
+             new Secuencia(
+                new string[]{"coger", "tirar"},
+                new string[]{"palanca", "palanca"},
+                1),
+            
+            //encender antorcha
+            new Secuencia(
+                new string[]{"prender", "acercar", "encender"},
+                new string[]{"fuego", "antorcha", "antorcha"},
+                2),
             //abrir puerta
             new Secuencia(
                 new string[]{"portal", "pomo", "pomo", "puerta", "escalera", "visillo"},
@@ -58,7 +69,7 @@ public class SecuenciasAcciones{
              new Secuencia(
                 new string[]{"cartera", "cartera", "DNI", "DNI", "DNI", "tarjeta", "carné", "monedas", "bolsillo"},
                 new string[]{"sacar", "abrir", "buscar", "coger", "sacar", "contar", "observar", "leer"},
-                5),
+                4),
 
         };
 
