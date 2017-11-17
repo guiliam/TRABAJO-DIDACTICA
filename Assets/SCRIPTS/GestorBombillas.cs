@@ -1,51 +1,147 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class GestorBombillas : MonoBehaviour {
+public class GestorBombillas : MonoBehaviour {	
+	public GameObject[] Niveles;
+	public string[] FrasesRey;
+	public GameObject CanvasNivelCompletado;
+	public Text TextRey, TextNivelesCompletados;
 
+	Transform[] Bombillas;
+	Transform[] Botones;
+	Transform[] posicionesBombillas;
+	Transform[] posicionesBotones;
+	Vector3[] posicionesBombillasVector;
+	Vector3[] posicionesBotonesVector;
+	int nivelActual, bombillasActivas;
+	bool completado;
+	float timeAux;
+
+	void Awake(){
+		inicializarSiguienteNivel ();
+	}
+
+	void Update(){
+		if (bombillasActivas == Bombillas.Length) {
+			completado = true;
+			CanvasNivelCompletado.SetActive (true);
+		}
+		if (completado) {
+			timeAux += Time.deltaTime;
+		}
+		if(timeAux > 3){
+			timeAux = 0;
+			nivelActual++;
+			inicializarSiguienteNivel ();}
+	}
+
+	Transform[] desordenar(Transform[] value)
+	{
+		Transform[] newValue = new Transform[value.Length];
+		bool[] visited = new bool[value.Length];
+		int actualPosition;
+
+		for (int i = 0; i < value.Length; i++) {
+			while (newValue [i] == null) {
+				actualPosition = Random.Range (0, value.Length);
+				if(!visited[actualPosition]){
+					newValue[i] = value[actualPosition];
+					visited[actualPosition] = true;
+				}
+			}
+		}
+		return newValue;
+	}
+
+	void inicializarSiguienteNivel(){
+		TextNivelesCompletados.text = "Generadores activados:\n" + nivelActual + "/10";
+		TextRey.text = FrasesRey [nivelActual];
+		CanvasNivelCompletado.SetActive (false);
+		bombillasActivas = 0;
+		completado = false;
+		if (nivelActual > 0)
+			Niveles [nivelActual - 1].SetActive (false);
+		Niveles [nivelActual].SetActive (true);
+
+		GameObject[] bombillasGameObjects = GameObject.FindGameObjectsWithTag ("bombilla");
+		Bombillas = new Transform[bombillasGameObjects.Length];
+		for (int i = 0; i < Bombillas.Length; i++) {
+			Bombillas [i] = bombillasGameObjects [i].transform;
+		}
+		GameObject[] botonesGameObjects = GameObject.FindGameObjectsWithTag ("boton");
+		Botones = new Transform[botonesGameObjects.Length];
+		for (int i = 0; i < Botones.Length; i++) {
+			Botones [i] = botonesGameObjects [i].transform;
+		}
+		posicionesBombillas = desordenar (Bombillas);
+		posicionesBotones = desordenar (Botones);
+		posicionesBombillasVector = new Vector3[posicionesBombillas.Length];
+		posicionesBotonesVector = new Vector3[posicionesBotones.Length];
+		getPositions (posicionesBombillas, posicionesBombillasVector);
+		getPositions (posicionesBotones, posicionesBotonesVector);
+		setPositions (Bombillas, posicionesBombillasVector);
+		setPositions (Botones, posicionesBotonesVector);
+	}
+
+	void getPositions(Transform[] transforms, Vector3[] vectores){
+		for (int i = 0; i < vectores.Length; i++) {
+			vectores [i] = transforms [i].position;
+		}
+	}
+
+	void setPositions(Transform[] array1, Vector3[] array2){
+		for (int i = 0; i < array1.Length; i++) {
+			array1 [i].position = array2 [i];
+		}		
+	}
+
+	public void SumarBombilla(){
+		bombillasActivas++;
+	}
+
+	public void ReiniciarBombillasEncendidas(){
+		bombillasActivas = 0;
+	}
+
+	public void RestarBombilla(){
+		bombillasActivas--;
+	}
+
+}
+
+
+
+/*
 	const int NIVELES_HARDCODED = 4;
 
-
-	public bool[] BombillasEncendidas;
 	public GameObject PrefabBombilla, PrefabBoton;
 	public GameObject[] HardcodedLvls;
 	public float limiteDer, limiteIzq;
 
 
+	List<int> numBombillasNiveles;
 	private GameObject[] Bombillas, Botones;
 	int actualLvl;
 
-	void Start(){
-		print (Mathf.Ceil (5 / 2 + 0.1f));
+	void Awake(){
 		actualLvl = 1;
 		StartLvl ();
 	}
 
 	void StartLvl(){
 		if (actualLvl <= 4) {
-			BombillasEncendidas = new bool[GameObject.Find ("Bombillas" + actualLvl).GetComponentsInChildren<Light> ().Length];
 			HardcodedLvls [actualLvl - 1].SetActive (true);
-			if (actualLvl > 2)
+			if (actualLvl >= 2)
 				HardcodedLvls [actualLvl - 2].SetActive (false);
 		} else {
-			/*if (Random.value < 0.5)
-				MetodoCristian();
-			else
-				MetodoJapend ();*/
+			//RandomLights ();
 		}
 	}
 
-	public void MetodoCristian(int numeroBombillas,int numeroBotones){
-		for (int i = 0; i < numeroBombillas; i++) {
-			Bombillas [i] = Instantiate (PrefabBombilla);
-		}
-		int numBombillasPrimerBoton = (int) Mathf.Round(numeroBombillas / 2);
 
-
-	}
-
-	public void MetodoJapend(int numeroBombillas,int numeroBotones){
+	public void RandomLights(int numeroBombillas,int numeroBotones){
 
 		bool[] encendidas = new bool[numeroBombillas];
 		for (int i = 0; i < numeroBombillas; i++)
@@ -118,7 +214,6 @@ public class GestorBombillas : MonoBehaviour {
 		foreach (int num in bombillas) {
 			boton.bombillas [aux] = Bombillas [num].gameObject.GetComponent<Renderer> ();
 		}
-
+			
 		boton.Inicializar ();
-	}
-}
+	}*/
