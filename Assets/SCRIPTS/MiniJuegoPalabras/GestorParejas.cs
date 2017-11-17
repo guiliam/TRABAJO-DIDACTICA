@@ -223,7 +223,7 @@ public class GestorParejas : MonoBehaviour {
         GameObject nuevoTexto = GameObject.Instantiate(textoSecuenciaBase);
         nuevoTexto.SetActive(true);
         nuevoTexto.transform.SetParent(canvasSecuencia.transform);
-        nuevoTexto.GetComponent<Text>().text = secuenciaActiva.verbos[parejaActual] + " " + secuenciaActiva.nombres[parejaActual];
+		nuevoTexto.GetComponent<Text>().text = secuenciaActiva.nombres[parejaActual] + " " + secuenciaActiva.verbos[parejaActual];
         nuevoTexto.transform.localPosition = new Vector3(textoSecuenciaBase.transform.localPosition.x, textoSecuenciaBase.transform.localPosition.y - INCREMENTO_VERTICAL_TEXTO_PAREJAS_RESUELTAS * parejaActual,
             textoSecuenciaBase.transform.localPosition.z);
         nuevoTexto.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
