@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#define DEBUG
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -7,6 +9,13 @@ using UnityEngine.UI;
 public class CreacionCodigoAleatorio : MonoBehaviour {
 
     private const int TOTAL_BOTONES_SOLUCION = 8;
+
+    //TIPOS DE LINEA
+    private const int LINEA_NORMAL = 0;
+    private const int LINEA_CONDICION = 1;
+    private const int BUCLE_WHILE = 2;
+    private const int BUCLE_FOR = 3;
+    List<int> listaReferenciaTiposLineas = new List<int>(new int[] {0,1,2,3});
 
     struct operacion
     {
@@ -17,12 +26,41 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         //casos especiales
         bool operacionNoConmutativaConValorPrimero; //operaciones tipo x = 5 - x \\\ x = 5 / x \\\ x = 5 % x
 
-        public operacion(int o, int v, int val, bool opNoConmu)
+        //bucles y condiciones
+        bool bucle;
+        bool condicional;
+        bool condicionalConElse;
+
+        List<operacion> instrucciones;
+        List<operacion> instruccionesAlternativa;
+
+        //constructor para operaciones normales y condicionales
+        //si es una condicion, l operador sera el comparador, el valor aquello con lo que se comparara y la variable lo que sera comparado
+        public operacion(int o, int v, int val, bool opNoConmu, bool condicional = false, bool condicionalElse = false, List<operacion> lista = null, List<operacion> listaLAter = null)
         {
             operador = o;
             variable = v;
             valor = val;
             operacionNoConmutativaConValorPrimero = opNoConmu;
+            bucle = false;
+            this.condicional = condicional;
+            condicionalConElse = condicionalElse;
+            instrucciones = lista;
+            instruccionesAlternativa = listaLAter;
+        }
+
+        //constructor para bucles (la variable es la que decide cuando salir del bucle, el operador la condicion a satisfacer y el valor el valor con el que se va a comparar
+        public operacion(int o, int v, int val, bool opNoConmu, bool bucle, List<operacion> lista = null)
+        {
+            operador = o;
+            variable = v;
+            valor = val;
+            operacionNoConmutativaConValorPrimero = opNoConmu;
+            this.bucle = bucle;
+            condicional = false;
+            condicionalConElse = false;
+            instrucciones = lista;
+            instruccionesAlternativa = null;
         }
 
         public int GetOperador()
@@ -44,6 +82,31 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         {
             return operacionNoConmutativaConValorPrimero;
         }
+
+        public bool GetBucle()
+        {
+            return bucle;
+        }
+
+        public bool GetCondicional()
+        {
+            return condicional;
+        }
+
+        public bool GetCondicionalConElse()
+        {
+            return condicionalConElse;
+        }
+
+        public List<operacion> GetListaInstrucciones()
+        {
+            return instrucciones;
+        }
+
+        public List<operacion> GetListaInstruccionesAlternatva()
+        {
+            return instruccionesAlternativa;
+        }
     }
 
     public const int MUY_FACIL = 0;
@@ -58,6 +121,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     public const int MUY_DIFICIL = 5;
 
     private char[] OPERADORES = {'=', '+' , '-', '*', '/', '%'};
+    private string[] COMPARADORES = {"==", "!=", ">=", "<=", "<", ">"}; 
 
     private int dificultad;
     private int operadoresAdmitidos;
@@ -73,6 +137,9 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         buclesWhile,
         buclesFor;
     bool elsePendiente;
+
+    //esta lista se usa para asignar los tipos de lineas y repetar las cantidades
+    List<int> tiposLineasRestantes;
 
     #region VARIABLES UNITY
     Text soporteCodigo;
@@ -101,16 +168,25 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
             botonesSolucion[i] = GameObject.Find("Boton" + i);
         }
 
+        //limpia las variables
         inicializarVariablesRelacionadasConCodigo();
-        dificultad = MUY_FACIL;
+        dificultad = MEDIO;
         bool codigoBueno = false; //para evitar divisiones entre 0
         while (!codigoBueno)
         {
+            //se decide parametros del codigo (lineas, bucles...)
             decidirCodigo();
+            //se generan las lineas
             generarLineasCodigo();
-            codigoBueno = resolverCodigo();
+            //se resuelve el codigo (true si se resuelve / false si hay problemas)
+            codigoBueno = resolverCodigo(operaciones);
         }
+        //se activan los botones correspondientes y se prepara la pregunta
         prepararBotonesYPregunta();
+
+#if DEBUG
+        imprimeValoresVariables();
+#endif
         print(valoresVariables[0]);
     }
 
@@ -121,7 +197,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         //decide cuantas lineas (APROXIMADAMENTE EN EL CASO DE LOS BUCLES) habra
         maxLineas = (dificultad + 1) * 3;
-        maxLineas = (int) Mathf.Ceil(maxLineas * UnityEngine.Random.Range(dificultad, maxLineas));
+        maxLineas = 7;// (int)Mathf.Max(Mathf.Ceil(maxLineas + UnityEngine.Random.Range(dificultad, maxLineas - 10)), 7);
 
         //se generan las variables
         obtenerVariables();
@@ -130,21 +206,23 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         switch (dificultad)
         {
             case MUY_FACIL:
-                operadoresAdmitidos = 6;
+                operadoresAdmitidos = 3;
                 numeroDeVariables = 1;
                 operadoresReducidos = false;
                 break;
 
             case FACIL:
-                operadoresAdmitidos = 3;
+                operadoresAdmitidos = 4;
                 numeroDeVariables = 2;
                 operadoresReducidos = true;
                 break;
 
             case MEDIO:
                 //generamos condiciones
+                operadoresAdmitidos = 5;
+                numeroDeVariables = 1;
                 operadoresReducidos = true;
-                condiciones = UnityEngine.Random.Range(1, 3);
+                condiciones = UnityEngine.Random.Range(1, 2);
                 break;
 
             case MEDIO_DIFICIL:
@@ -166,17 +244,31 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         int seleccion = 0;
 
         obtenerVariables();
-        
+
+        //la lista deoperaciones disponibles se actualiza
+        if (buclesFor <= 0)
+            tiposLineasRestantes.Remove(BUCLE_FOR);
+        if (buclesWhile <= 0)
+            tiposLineasRestantes.Remove(BUCLE_WHILE);
+        if (condiciones <= 0)
+            tiposLineasRestantes.Remove(LINEA_CONDICION);
 
         for (int iterador = 0; iterador < maxLineas; iterador++)
         {
             //print("generandoLinea" + maximo);
-            seleccion = UnityEngine.Random.Range(0, maximo);
+            seleccion = UnityEngine.Random.Range(0, tiposLineasRestantes.Count);
 
             switch (seleccion)
             {
-                case 0: //linea normal
+                case LINEA_NORMAL:
                     generarLineaNormal();
+                    break;
+
+                case LINEA_CONDICION:
+                    generarCondicion();
+                    condiciones--;
+                    if (condiciones <= 0)
+                        tiposLineasRestantes.Remove(LINEA_CONDICION);
                     break;
             }
 
@@ -224,87 +316,72 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         generarLineasDeclaracionVariables();
     }
 
-
-    private void generarLineasDeclaracionVariables()
-    {
-        //recorre las id de variables y los valores de estas y las inicializa a dichos valores
-        for (int iterador = 0; iterador < identificadoresVariables.Count; iterador++)
-        {
-            soporteCodigo.text = soporteCodigo.text +
-                declaracionVariable(identificadoresVariables[iterador], valoresVariables[iterador]) + "\n";
-        }
-    }
-
-    private void generarLineaNormal()
-    {
-        //print("Generando linea normal");
-        //int operador = UnityEngine.Random.Range(1, operadoresAdmitidos);
-        float auxRand = 0;
-        bool operacionNoConmutativaConValorDelante = false;
-
-        int indiceOperador, indiceVariable, valor;
-        indiceOperador = UnityEngine.Random.Range(1, operadoresAdmitidos - 1);
-        indiceVariable = UnityEngine.Random.Range(0, numeroDeVariables - 1);
-        valor = UnityEngine.Random.Range(1, 10);
-
-
-        //print("operador, variable, valor / " + indiceOperador + indiceVariable + valor); 
-        if (operadoresReducidos)
-        {
-            auxRand = UnityEngine.Random.value;
-        }
-        else
-        {
-            auxRand = 1;
-        }
-
-
-        if (auxRand < 0.5)
-        {
-            soporteCodigo.text += operacionSimple(identificadoresVariables[indiceVariable],
-                OPERADORES[indiceOperador],
-                valor);
-
-        }
-
-        else
-        {
-            if (UnityEngine.Random.value > 0.5f)
-            {
-                if (indiceOperador == 2 || indiceOperador == 4 || indiceOperador == 5)
-                {
-                    print("op no conmu " + indiceOperador);
-                    operacionNoConmutativaConValorDelante = true;
-                }
-                soporteCodigo.text +=  operacionSimpleSinOperadoresContraidosPrimeroValor(identificadoresVariables[indiceVariable],
-                OPERADORES[indiceOperador],
-                valor);
-            }
-            else
-            {
-                soporteCodigo.text +=  operacionSimpleSinOperadoresContraidosPrimeroVariable(identificadoresVariables[indiceVariable],
-                OPERADORES[indiceOperador],
-                valor);
-            }
-        }
-
-        //se anade la operacion a la lista
-        operaciones.Add(new operacion(indiceOperador, indiceVariable, valor, operacionNoConmutativaConValorDelante));
-    }
-
     private void inicializarVariablesRelacionadasConCodigo()
     {
         identificadoresVariables.Clear();
         valoresVariables.Clear();
         soporteCodigo.text = "";
+        condiciones = 0;
+        //se inicializa la lista
+        tiposLineasRestantes = new List<int>(new int[] { 0, 1, 2, 3});
     }
 
-    private bool resolverCodigo()
+    private bool resolverCodigo(List<operacion> operaciones)
     {
         try
         {
             foreach (operacion op in operaciones)
             {
+                if (op.GetCondicional() || op.GetCondicionalConElse())
+                {
+                    print(COMPARADORES[op.GetOperador()] + " " + valoresVariables[op.GetVariable()] + " " + op.GetValor() + " " + op.GetCondicionalConElse());
+                    switch (COMPARADORES[op.GetOperador()])
+                    {
+                        case "==":
+                            if (valoresVariables[op.GetVariable()] == op.GetValor())
+                                resolverCodigo(op.GetListaInstrucciones());
+                            else if (op.GetCondicionalConElse())
+                                resolverCodigo(op.GetListaInstruccionesAlternatva());
+                            break;
+
+                        case "!=":
+                            if (valoresVariables[op.GetVariable()] != op.GetValor())
+                                resolverCodigo(op.GetListaInstrucciones());
+                            else if (op.GetCondicionalConElse())
+                                resolverCodigo(op.GetListaInstruccionesAlternatva());
+                            break;
+
+                        case ">=":
+                            if (valoresVariables[op.GetVariable()] >= op.GetValor())
+                                resolverCodigo(op.GetListaInstrucciones());
+                            else if (op.GetCondicionalConElse())
+                                resolverCodigo(op.GetListaInstruccionesAlternatva());
+                            break;
+
+                        case "<=":
+                            if (valoresVariables[op.GetVariable()] == op.GetValor())
+                                resolverCodigo(op.GetListaInstrucciones());
+                            else if (op.GetCondicionalConElse())
+                                resolverCodigo(op.GetListaInstruccionesAlternatva());
+                            break;
+
+                        case ">":
+                            if (valoresVariables[op.GetVariable()] == op.GetValor())
+                                resolverCodigo(op.GetListaInstrucciones());
+                            else if (op.GetCondicionalConElse())
+                                resolverCodigo(op.GetListaInstruccionesAlternatva());
+                            break;
+
+                        case "<":
+                            if (valoresVariables[op.GetVariable()] == op.GetValor())
+                                resolverCodigo(op.GetListaInstrucciones());
+                            else if (op.GetCondicionalConElse())
+                                resolverCodigo(op.GetListaInstruccionesAlternatva());
+                            break;
+                    }
+
+                    continue;
+                }
                     switch (OPERADORES[op.GetOperador()])
                     {
                         case '='://ASIGNACION
@@ -355,7 +432,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
     private void prepararBotonesYPregunta()
     {
-        int indiceVariable = UnityEngine.Random.Range(0, identificadoresVariables.Count - 1);
+        int indiceVariable = UnityEngine.Random.Range(0, identificadoresVariables.Count);
         prepararPregunta(indiceVariable);
         int botonCorrecto =  UnityEngine.Random.Range(0, dificultad + 1);
         List<int> aux = new List<int>();
@@ -387,7 +464,141 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         textoPregunta.text = "¿Qué valor tiene la variable \'" + identificadoresVariables[variableParaPreguntar] + "\'?";
     }
 
+
     #region GENERADORES LINEAS
+
+
+    private operacion generarLineaNormal(bool anadir = true)
+    {
+        //anadir decide si la operacion se anade a la lista general de operaciones y se devuelve o si solo se devuelve
+        //print("Generando linea normal");
+        //int operador = UnityEngine.Random.Range(1, operadoresAdmitidos);
+        float auxRand = 0;
+        bool operacionNoConmutativaConValorDelante = false;
+
+        int indiceOperador, indiceVariable, valor;
+        indiceOperador = UnityEngine.Random.Range(1, operadoresAdmitidos);
+        indiceVariable = UnityEngine.Random.Range(0, numeroDeVariables);
+        valor = UnityEngine.Random.Range(1, 10);
+
+
+        //print("operador, variable, valor / " + indiceOperador + indiceVariable + valor); 
+
+        // si se permiten operadores reducidos, se decide si esta linea tendra uno
+        if (operadoresReducidos)
+        {
+            auxRand = UnityEngine.Random.value;
+        }
+        else
+        {
+            auxRand = 1;
+        }
+
+
+        //si lo tiene se genera
+        if (auxRand < 0.5)
+        {
+            soporteCodigo.text += operacionSimple(identificadoresVariables[indiceVariable],
+                OPERADORES[indiceOperador],
+                valor);
+
+        }
+
+        else
+        {
+            if (UnityEngine.Random.value > 0.5f)
+            {
+                if (indiceOperador == 2 || indiceOperador == 4 || indiceOperador == 5)
+                {
+                    print("op no conmu " + indiceOperador);
+                    operacionNoConmutativaConValorDelante = true;
+                }
+                soporteCodigo.text += operacionSimpleSinOperadoresContraidosPrimeroValor(identificadoresVariables[indiceVariable],
+                OPERADORES[indiceOperador],
+                valor);
+            }
+            else
+            {
+                soporteCodigo.text += operacionSimpleSinOperadoresContraidosPrimeroVariable(identificadoresVariables[indiceVariable],
+                OPERADORES[indiceOperador],
+                valor);
+            }
+        }
+
+        //se anade la operacion a la lista
+        operacion aux = new operacion(indiceOperador, indiceVariable, valor, operacionNoConmutativaConValorDelante);
+        if(anadir)
+            operaciones.Add(aux);
+        return aux;
+    }
+
+
+    private void generarLineasDeclaracionVariables()
+    {
+        //recorre las id de variables y los valores de estas y las inicializa a dichos valores
+        for (int iterador = 0; iterador < identificadoresVariables.Count; iterador++)
+        {
+            soporteCodigo.text = soporteCodigo.text +
+                declaracionVariable(identificadoresVariables[iterador], valoresVariables[iterador]) + "\n";
+        }
+    }
+
+
+    private void generarCondicion()
+    {
+        //primero se decide si habra o no else
+        bool habraElse = true;
+        if (UnityEngine.Random.value > 0.5f)
+            habraElse = true;
+
+        //se crea la lista auxiliar que contendra las operaciones a realizar si la operacion se cumple (o si no lo hace si hay un else);
+        List<operacion> instruccionesIf = new List<operacion>();
+
+        //se decide la condicion (igual, distinto, mayor, igual)
+        int condicion = UnityEngine.Random.Range(0, COMPARADORES.Length - 1);
+        //se decide cuantas lineas habra dentro
+        int numeroLineas = UnityEngine.Random.Range(1, 3);
+        //se decide que variable va a compararse y con que valor
+        int indiceVariable = UnityEngine.Random.Range(0, numeroDeVariables);
+        int valor = UnityEngine.Random.Range(1, 10);
+
+        //se genera la linea de condicion
+        soporteCodigo.text += sentenciaIf(identificadoresVariables[indiceVariable], COMPARADORES[condicion], valor);
+
+        for (int i = 0; i < numeroLineas; i++)
+        {
+            instruccionesIf.Add(generarLineaNormal(false));
+        }
+
+        //cerramos bloque condicion
+        soporteCodigo.text += cierreSentenciaCondicional();
+
+        if (!habraElse)
+        {
+            //anadimos y terminamos
+            operaciones.Add(new operacion(condicion, indiceVariable, valor, false, true, habraElse, instruccionesIf));
+            return;
+        }
+        else
+        {
+            List<operacion> listaElse = new List<operacion>();
+            numeroLineas = UnityEngine.Random.Range(1, 3);
+            soporteCodigo.text += sentenciaElse();
+
+            for (int i = 0; i < numeroLineas; i++)
+            {
+                listaElse.Add(generarLineaNormal(false));
+            }
+
+            soporteCodigo.text += cierreSentenciaCondicional();
+
+            operaciones.Add(new operacion(condicion, indiceVariable, valor, false, true, habraElse, instruccionesIf, listaElse));
+        }
+    }
+
+    #endregion
+
+    #region GENERADORES LINEAS TEXTO
 
     private string tabular()
     {
@@ -424,6 +635,27 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         return tabular() + var + operador + "= " + Convert.ToString(valor) + "; \n";
     }
 
+    private string sentenciaIf(char var, string operador, int valor)
+    {
+        string aux = tabular() + "SI (" + var + " " + operador + " " + valor + ") \n { \n";
+        tabuladores++;
+        return aux;
+
+    }
+
+    private string sentenciaElse()
+    {
+        string aux =  tabular() + " SI NO \n { \n";
+        tabuladores++;
+        return aux;
+    }
+
+    private string cierreSentenciaCondicional()
+    {
+        tabuladores--;
+        return tabular() + "} \n";
+    }
+
     #endregion
 
 
@@ -458,5 +690,18 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         resultado %= valor;
     }
+    #endregion
+
+    #region DEBUG_FUNCTIONS
+
+    private void imprimeValoresVariables()
+    {
+        for (int i = 0; i < identificadoresVariables.Count; i++)
+        {
+            print("Variable " + identificadoresVariables[i] + " vale " + valoresVariables[i]);
+        }
+
+    }
+
     #endregion
 }
