@@ -121,7 +121,19 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     public const int MUY_DIFICIL = 5;
 
     private char[] OPERADORES = {'=', '+' , '-', '*', '/', '%'};
-    private string[] COMPARADORES = {"==", "!=", ">=", "<=", "<", ">"}; 
+    private const int SUMA = 1;
+    private const int RESTA = 2;
+    private const int MULTIPLICACION = 3;
+    private const int DIVISION = 4;
+    private const int RESTO = 5;
+
+    private string[] COMPARADORES = {"==", "!=", ">=", "<=", "<", ">"};
+    private const int IGUAL = 0;
+    private const int DISTINTO = 1;
+    private const int MAYOR_IGUAL = 2;
+    private const int MENOR_IGUAL = 3;
+    private const int MENOR = 4;
+    private const int MAYOR = 5;
 
     private int dificultad;
     private int operadoresAdmitidos;
@@ -170,7 +182,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
         //limpia las variables
         inicializarVariablesRelacionadasConCodigo();
-        dificultad = MEDIO;
+        dificultad = MEDIO_DIFICIL;
         bool codigoBueno = false; //para evitar divisiones entre 0
         while (!codigoBueno)
         {
@@ -187,7 +199,6 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 #if DEBUG
         imprimeValoresVariables();
 #endif
-        print(valoresVariables[0]);
     }
 
     #endregion
@@ -197,7 +208,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         //decide cuantas lineas (APROXIMADAMENTE EN EL CASO DE LOS BUCLES) habra
         maxLineas = (dificultad + 1) * 3;
-        maxLineas = 7;// (int)Mathf.Max(Mathf.Ceil(maxLineas + UnityEngine.Random.Range(dificultad, maxLineas - 10)), 7);
+        maxLineas = 3;// (int)Mathf.Max(Mathf.Ceil(maxLineas + UnityEngine.Random.Range(dificultad, maxLineas - 10)), 7);
 
         //se generan las variables
         obtenerVariables();
@@ -226,6 +237,11 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
                 break;
 
             case MEDIO_DIFICIL:
+                operadoresAdmitidos = 5;
+                numeroDeVariables = 2;
+                operadoresReducidos = true;
+                condiciones = 1;//UnityEngine.Random.Range(0, 2);
+                buclesWhile = UnityEngine.Random.Range(1, 1);
                 break;
 
             case DIFICIL:
@@ -257,8 +273,8 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         {
             //print("generandoLinea" + maximo);
             seleccion = UnityEngine.Random.Range(0, tiposLineasRestantes.Count);
-
-            switch (seleccion)
+            //print(seleccion);
+            switch (tiposLineasRestantes[seleccion])
             {
                 case LINEA_NORMAL:
                     generarLineaNormal();
@@ -269,6 +285,13 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
                     condiciones--;
                     if (condiciones <= 0)
                         tiposLineasRestantes.Remove(LINEA_CONDICION);
+                    break;
+
+                case BUCLE_WHILE:
+                    generarBucleWhile();
+                    buclesWhile--;
+                    if (buclesWhile <= 0)
+                        tiposLineasRestantes.Remove(BUCLE_WHILE);
                     break;
             }
 
@@ -322,6 +345,8 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         valoresVariables.Clear();
         soporteCodigo.text = "";
         condiciones = 0;
+        buclesWhile = 0;
+        buclesFor = 0;
         //se inicializa la lista
         tiposLineasRestantes = new List<int>(new int[] { 0, 1, 2, 3});
     }
@@ -332,9 +357,84 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         {
             foreach (operacion op in operaciones)
             {
+                //bucles
+                if(op.GetBucle())
+                {
+                    print("Hay bucle");
+                    //evaluamos condicion de entrada
+                    bool ejecucion = false;
+
+                    switch (op.GetOperador())
+                    {
+                        case IGUAL:
+                            if (valoresVariables[op.GetVariable()] == op.GetValor())
+                                ejecucion = true;
+                            break;
+                        case MAYOR:
+                            if (valoresVariables[op.GetVariable()] > op.GetValor())
+                                ejecucion = true;
+                            break;
+                        case MAYOR_IGUAL:
+                            if (valoresVariables[op.GetVariable()] >= op.GetValor())
+                                ejecucion = true;
+                            break;
+                        case MENOR:
+                            if (valoresVariables[op.GetVariable()] < op.GetValor())
+                                ejecucion = true;
+                            break;
+                        case MENOR_IGUAL:
+                            if (valoresVariables[op.GetVariable()] <= op.GetValor())
+                                ejecucion = true;
+                            break;
+                        default:
+                            print("Operador extrano en bucle");
+                            break;
+
+                    }
+
+                    while(ejecucion)
+                    {
+                        resolverCodigo(op.GetListaInstrucciones());
+
+                            //volvemos a comprobar la condicion
+                        ejecucion = false;
+                        switch (op.GetOperador())
+                        {
+                            case IGUAL:
+                                if (valoresVariables[op.GetVariable()] == op.GetValor())
+                                    ejecucion = true;
+                                break;
+                            case MAYOR:
+                                if (valoresVariables[op.GetVariable()] > op.GetValor())
+                                    ejecucion = true;
+                                break;
+                            case MAYOR_IGUAL:
+                                if (valoresVariables[op.GetVariable()] >= op.GetValor())
+                                    ejecucion = true;
+                                break;
+                            case MENOR:
+                                if (valoresVariables[op.GetVariable()] < op.GetValor())
+                                    ejecucion = true;
+                                break;
+                            case MENOR_IGUAL:
+                                if (valoresVariables[op.GetVariable()] <= op.GetValor())
+                                    ejecucion = true;
+                                break;
+                            default:
+                                print("Operador extrano en bucle");
+                                break;
+
+                        }
+
+                    }
+                    continue;
+
+                }
+
+                //condiciones if else
                 if (op.GetCondicional() || op.GetCondicionalConElse())
                 {
-                    print(COMPARADORES[op.GetOperador()] + " " + valoresVariables[op.GetVariable()] + " " + op.GetValor() + " " + op.GetCondicionalConElse());
+                   // print(COMPARADORES[op.GetOperador()] + " " + valoresVariables[op.GetVariable()] + " " + op.GetValor() + " " + op.GetCondicionalConElse());
                     switch (COMPARADORES[op.GetOperador()])
                     {
                         case "==":
@@ -468,8 +568,11 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     #region GENERADORES LINEAS
 
 
-    private operacion generarLineaNormal(bool anadir = true)
+    private operacion generarLineaNormal(bool anadir = true, int indiceVariableExcluida = -1, int variableParaUsar = -1, int operadorParaUsar = -1)
     {
+        //la variable excluida es una variable que NO podra ser usada en las operaciones que se generen
+        //si se proporciona variableParaUsar, la linea que se genere modificara dicha variable con el operador que se pase en operadorParaUsar
+
         //anadir decide si la operacion se anade a la lista general de operaciones y se devuelve o si solo se devuelve
         //print("Generando linea normal");
         //int operador = UnityEngine.Random.Range(1, operadoresAdmitidos);
@@ -477,9 +580,28 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         bool operacionNoConmutativaConValorDelante = false;
 
         int indiceOperador, indiceVariable, valor;
-        indiceOperador = UnityEngine.Random.Range(1, operadoresAdmitidos);
-        indiceVariable = UnityEngine.Random.Range(0, numeroDeVariables);
-        valor = UnityEngine.Random.Range(1, 10);
+
+        //se selecciona el operador
+        if (operadorParaUsar != -1)
+            indiceOperador = operadorParaUsar;
+        else
+            indiceOperador = UnityEngine.Random.Range(1, operadoresAdmitidos);
+
+        //se selecciona la variable
+        if (variableParaUsar != -1)
+            indiceVariable = variableParaUsar;
+        else
+        {
+            indiceVariable = UnityEngine.Random.Range(0, numeroDeVariables);
+
+            if (indiceVariableExcluida != -1)
+            {
+                while (indiceVariable == indiceVariableExcluida)
+                    indiceVariable = UnityEngine.Random.Range(0, numeroDeVariables);
+            }
+        }
+
+        valor = UnityEngine.Random.Range(1, 5);
 
 
         //print("operador, variable, valor / " + indiceOperador + indiceVariable + valor); 
@@ -596,6 +718,55 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         }
     }
 
+    private void generarBucleWhile()
+    {
+        List<operacion> operacionesBucle = new List<operacion>();
+
+        //se elige la variable que servira para controlar la ejecucion del bucle
+        //para evitar problemas, esa variable se excluira de las operaciones de dentro del bucle
+        //a excepcion de una linea al final que modificara su valor para salir eventualmente del bucle
+        int indiceVariableCondicion = UnityEngine.Random.Range(0, identificadoresVariables.Count);
+        //se decide la condicion (igual, distinto, mayor, igual)
+        int condicion = UnityEngine.Random.Range(0, COMPARADORES.Length - 1);
+        //para reducir complejidad, eliminamos distinto
+        if(condicion == DISTINTO)
+            condicion++;
+        //se decide cuantas lineas habra dentro
+        int numeroLineas = UnityEngine.Random.Range(1, 3);
+        //se decide que valor va a compararse
+        int valor = UnityEngine.Random.Range(1, 10);
+
+        soporteCodigo.text += bucleWhile(identificadoresVariables[indiceVariableCondicion], COMPARADORES[condicion], valor);
+
+        for (int i = 0; i < numeroLineas; i++)
+        {
+            operacionesBucle.Add(generarLineaNormal(false, indiceVariableCondicion));
+        }
+
+        //se anade la operacion que modificara la variable que controla la ejecucion ddel bucle
+
+        //si la comparacion es 'MIENTRAS SEA MAYOR', la variable se decrementa
+        if (condicion == MAYOR || condicion == MAYOR_IGUAL)
+        {
+            operacionesBucle.Add(generarLineaNormal(false, -1, indiceVariableCondicion, RESTA));
+        }
+        //si la comparacion es 'MIENTRAS SEA MENOR', la variable se incrementa
+        else if(condicion == MENOR || condicion == MENOR_IGUAL)
+        {
+            operacionesBucle.Add(generarLineaNormal(false, -1, indiceVariableCondicion, SUMA));
+        }
+        //si la comparacion es "mientras sea igual", no importa
+        else
+        {
+            operacionesBucle.Add(generarLineaNormal(false, -1, indiceVariableCondicion));
+        }
+
+        //anadimos el bucle
+        //condicion sera el comparador, variable la variable a comparar y valor la variable con la que se comparara
+        operaciones.Add(new operacion(condicion, indiceVariableCondicion, valor, false, true, operacionesBucle));
+        soporteCodigo.text += cierreSentenciaCondicional();
+    }
+
     #endregion
 
     #region GENERADORES LINEAS TEXTO
@@ -645,7 +816,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
     private string sentenciaElse()
     {
-        string aux =  tabular() + " SI NO \n { \n";
+        string aux =  tabular() + "SI NO \n { \n";
         tabuladores++;
         return aux;
     }
@@ -654,6 +825,13 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         tabuladores--;
         return tabular() + "} \n";
+    }
+
+    private string bucleWhile(char var, string operador, int valor)
+    {
+        string aux = tabular() + "MIENTRAS (" + var + " " + operador + " " + valor + ") \n { \n";
+        tabuladores++;
+        return aux;
     }
 
     #endregion
