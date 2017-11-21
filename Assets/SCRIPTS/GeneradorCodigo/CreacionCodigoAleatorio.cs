@@ -366,6 +366,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         identificadoresVariables.Clear();
         valoresVariables.Clear();
+		operaciones.Clear ();
         soporteCodigo.text = "";
         condiciones = 0;
         buclesWhile = 0;
