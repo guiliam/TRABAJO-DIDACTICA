@@ -141,6 +141,8 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     private bool operadoresReducidos; //decide si podran usarse operadores como +=, -=, etc.
 
     int tabuladores;
+    int aciertos;
+    int botonCorrecto;
     string lineaActual;
 
     //variables que definen el codigo que va a generarase
@@ -180,9 +182,30 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
             botonesSolucion[i] = GameObject.Find("Boton" + i);
         }
 
+
+        nuevoCodigo();
+        
+    }
+
+    private void nuevoCodigo()
+    {
         //limpia las variables
         inicializarVariablesRelacionadasConCodigo();
-        dificultad = MEDIO_DIFICIL;
+
+        if (aciertos < 3)
+            dificultad = MUY_FACIL;
+        else if (aciertos < 7)
+            dificultad = FACIL;
+        else if (aciertos < 11)
+            dificultad = MEDIO;
+        else if (aciertos < 16)
+            dificultad = MEDIO_DIFICIL;
+        else if (aciertos < 21)
+            dificultad = DIFICIL;
+        else if (aciertos < 30)
+            dificultad = MUY_DIFICIL;
+            
+
         bool codigoBueno = false; //para evitar divisiones entre 0
         while (!codigoBueno)
         {
@@ -207,8 +230,8 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     private void decidirCodigo()
     {
         //decide cuantas lineas (APROXIMADAMENTE EN EL CASO DE LOS BUCLES) habra
-        maxLineas = (dificultad + 1) * 3;
-        maxLineas = 3;// (int)Mathf.Max(Mathf.Ceil(maxLineas + UnityEngine.Random.Range(dificultad, maxLineas - 10)), 7);
+        maxLineas = (dificultad + 1) * 2;
+        //maxLineas = 3;// (int)Mathf.Max(Mathf.Ceil(maxLineas + UnityEngine.Random.Range(dificultad, maxLineas - 10)), 7);
 
         //se generan las variables
         obtenerVariables();
@@ -539,6 +562,11 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
         for(int i = valoresVariables[indiceVariable] - 20 ; i < valoresVariables[indiceVariable] + 20; i++)
         {
+            //comprobamos que no se saque el valor correcto
+            if (i == valoresVariables[indiceVariable])
+            {
+                continue;
+            }
             aux.Add(i);
         }
 
@@ -557,6 +585,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         }
         //elegimos el boton con la respuesta correcta
         GameObject.Find("Boton" + botonCorrecto).GetComponentInChildren<Text>().text = Convert.ToString(valoresVariables[indiceVariable]);
+        this.botonCorrecto = botonCorrecto;
     }
 
     private void prepararPregunta(int variableParaPreguntar)
@@ -564,6 +593,22 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         textoPregunta.text = "¿Qué valor tiene la variable \'" + identificadoresVariables[variableParaPreguntar] + "\'?";
     }
 
+    private void comprobarAcierto(int boton)
+    {
+        if (boton == botonCorrecto)
+        {
+            print("acierto");
+            aciertos++;
+            nuevoCodigo();
+        }
+
+        else
+        {
+            print("error");
+            aciertos -= 2;
+            nuevoCodigo();
+        }
+    }
 
     #region GENERADORES LINEAS
 
@@ -657,6 +702,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
     private void generarLineasDeclaracionVariables()
     {
+        soporteCodigo.text = "";
         //recorre las id de variables y los valores de estas y las inicializa a dichos valores
         for (int iterador = 0; iterador < identificadoresVariables.Count; iterador++)
         {
@@ -868,6 +914,50 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         resultado %= valor;
     }
+    #endregion
+
+    #region CLICK HANDLERS
+
+    public void OnClickBoton0()
+    {
+        comprobarAcierto(0);
+    }
+
+    public void OnClickBoton1()
+    {
+        comprobarAcierto(1);
+    }
+
+    public void OnClickBoton2()
+    {
+        comprobarAcierto(2);
+    }
+
+    public void OnClickBoton3()
+    {
+        comprobarAcierto(3);
+    }
+
+    public void OnClickBoton4()
+    {
+        comprobarAcierto(4);
+    }
+
+    public void OnClickBoton5()
+    {
+        comprobarAcierto(5);
+    }
+
+    public void OnClickBoton6()
+    {
+        comprobarAcierto(6);
+    }
+
+    public void OnClickBoton7()
+    {
+        comprobarAcierto(7);
+    }
+
     #endregion
 
     #region DEBUG_FUNCTIONS
