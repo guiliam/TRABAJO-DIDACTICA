@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,12 +12,16 @@ public class GestorParejas : MonoBehaviour {
     public float yInicialVerbos, yInicialNombres;
     public float incrementoX, incrementoY;
     public int numeroPanelesPorFila;
+	public string[] Misiones, FraseRey;
+	public Text TextMision, TextRey;
 
     bool panelCogido; //inica si hay un panel cogido
     SecuenciasAcciones secuencias;
     Secuencia secuenciaActiva;
     int indiceSecuenciaActiva; //indice de la secuencia activa
     int parejaActual; //indica por que pareja de la secuancia vamos
+	int misionActual;
+	int fraseReyActual;
 
     //paneles base
     GameObject soporteNombre;
@@ -38,6 +43,9 @@ public class GestorParejas : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         secuencias = SecuenciasAcciones.Getinstance();
+
+		TextMision.text = Misiones [misionActual];
+		TextRey.text = FraseRey [fraseReyActual];
 
         //soportes palabras
         soporteNombre = GameObject.Find("SoporteNombre");
@@ -200,7 +208,7 @@ public class GestorParejas : MonoBehaviour {
         //colocamos paneles aleatoriamente
         for (int i = 0; i < secuenciaActiva.nombres.Length; i++)
         {
-            posicionExtraida = listaPosAux[Random.Range(0, listaPosAux.Count - 1)];
+            posicionExtraida = listaPosAux[UnityEngine.Random.Range(0, listaPosAux.Count - 1)];
             listaPosAux.Remove(posicionExtraida);
             panelesNombresActivos[i].transform.localPosition = new Vector3(xInicial + (posicionExtraida % numeroPanelesPorFila * incrementoX),
                                                        yInicialNombres - (incrementoY * (posicionExtraida / numeroPanelesPorFila)), -2f);
@@ -209,7 +217,7 @@ public class GestorParejas : MonoBehaviour {
 
         for (int i = 0; i < secuenciaActiva.verbos.Length; i++)
         {
-            posicionExtraida = listaPosAux[Random.Range(0, listaPosAux.Count - 1)];
+			posicionExtraida = listaPosAux[UnityEngine.Random.Range(0, listaPosAux.Count - 1)];
             listaPosAux.Remove(posicionExtraida);
             panelesVerbosActivos[i].transform.localPosition = new Vector3(xInicial + (posicionExtraida % numeroPanelesPorFila * incrementoX),
                                                        yInicialNombres - (incrementoY * (posicionExtraida / numeroPanelesPorFila)), -2f);
@@ -240,7 +248,15 @@ public class GestorParejas : MonoBehaviour {
             indiceSecuenciaActiva++;
             secuenciaActiva = secuencias.Secuencias[indiceSecuenciaActiva];
             cargarSecuencia();
-
+			//cambiar dialogo y mision
+			misionActual++;
+			fraseReyActual++;
+			try{
+			TextMision.text = Misiones [misionActual];
+			TextRey.text = FraseRey [fraseReyActual];
+			}
+			catch(Exception e){
+			}
             //borrar parejas hechas
             for (int i = canvasSecuencia.transform.GetChildCount() - 1; i > 0; i--)
             {

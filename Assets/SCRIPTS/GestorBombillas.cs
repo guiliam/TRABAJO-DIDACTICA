@@ -8,6 +8,7 @@ public class GestorBombillas : MonoBehaviour {
 	public string[] FrasesRey;
 	public GameObject CanvasNivelCompletado, CanvasFinal;
 	public Text TextRey, TextNivelesCompletados;
+	public Light GeneralLight;
 
 	Transform[] Bombillas;
 	Transform[] Botones;
@@ -67,6 +68,7 @@ public class GestorBombillas : MonoBehaviour {
 	}
 
 	void inicializarSiguienteNivel(){
+		GeneralLight.intensity = 0.1f * (nivelActual - 1);
 		TextNivelesCompletados.text = "GENERADORES ACTIVADOS:\n" + nivelActual + "/10";
 		TextRey.text = FrasesRey [nivelActual];
 		CanvasNivelCompletado.SetActive (false);
