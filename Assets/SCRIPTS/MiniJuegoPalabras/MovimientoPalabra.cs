@@ -5,7 +5,7 @@ using UnityEngine;
 public class MovimientoPalabra : MonoBehaviour {
 
     private const float DISTANCE_TO_CAMERA = 7.5f;
-    private const float DISTANCE_STICK = 5f;
+    private const float DISTANCE_STICK = 15f;
     private const float OFFSET_POSICION = 20;
     private const float VELOCIDAD_VUELTA = 50f;
     private const float MARGEN_POSICION_INICIAL = 0.1f;
@@ -29,7 +29,7 @@ public class MovimientoPalabra : MonoBehaviour {
         if (cogido)
         {
             //movemos con el raton
-            this.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, DISTANCE_TO_CAMERA));
+            this.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40));
 
             //si esta cerca de un punto de union, se pegara a el
             candidato = null;
@@ -45,10 +45,11 @@ public class MovimientoPalabra : MonoBehaviour {
             {
                 if (lista[lista.IndexOf(obj)].active)
                 {
-                    aux = Vector3.Distance(obj.transform.transform.position, transform.position);
+                    aux = Vector3.Distance(obj.transform.position, transform.position);
                     //si esta lo bastante cerca, se pega
                     if (aux <= DISTANCE_STICK)
                     {
+                        print("Cerca");
                         //si ya habia un candidato, se coge el mas ceracno
                         if (aux < distanciaCandidato)
                         {

@@ -12,7 +12,6 @@ public class GestorParejas : MonoBehaviour {
     public float yInicialVerbos, yInicialNombres;
     public float incrementoX, incrementoY;
     public int numeroPanelesPorFila;
-	public string[] Misiones, FraseRey;
 	public Text TextMision, TextRey;
 
     bool panelCogido; //inica si hay un panel cogido
@@ -44,9 +43,6 @@ public class GestorParejas : MonoBehaviour {
 	void Awake () {
         secuencias = SecuenciasAcciones.Getinstance();
 
-		TextMision.text = Misiones [misionActual];
-		TextRey.text = FraseRey [fraseReyActual];
-
         //soportes palabras
         soporteNombre = GameObject.Find("SoporteNombre");
         soporteNombre.SetActive(false);
@@ -74,6 +70,7 @@ public class GestorParejas : MonoBehaviour {
 
     public bool ComprobarPareja(GameObject obj1)
     {
+        print("ComprobarPareja");
         print(carrying.transform.GetChild(0).GetComponent<Text>().text + obj1.transform.GetChild(0).GetComponent<Text>().text);
         if (carrying.GetComponent<MovimientoPalabra>().palabra)
         {
@@ -223,6 +220,8 @@ public class GestorParejas : MonoBehaviour {
                                                        yInicialNombres - (incrementoY * (posicionExtraida / numeroPanelesPorFila)), -2f);
             panelesVerbosActivos[i].GetComponent<MovimientoPalabra>().SetPosInicial(panelesVerbosActivos[i].transform.position);
         }
+
+        TextMision.text = secuenciaActiva.Descripcion;
     }
 
 
@@ -251,12 +250,6 @@ public class GestorParejas : MonoBehaviour {
 			//cambiar dialogo y mision
 			misionActual++;
 			fraseReyActual++;
-			try{
-			TextMision.text = Misiones [misionActual];
-			TextRey.text = FraseRey [fraseReyActual];
-			}
-			catch(Exception e){
-			}
             //borrar parejas hechas
             for (int i = canvasSecuencia.transform.GetChildCount() - 1; i > 0; i--)
             {

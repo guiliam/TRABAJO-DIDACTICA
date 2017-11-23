@@ -32,14 +32,16 @@ public struct Secuencia
 
     public string[] nombres;
     public string[] verbos;
+    public string Descripcion;
 
     public int parejas;
 
-    public Secuencia(string[] palsA, string[] palsB, int parejas)
+    public Secuencia(string[] palsA, string[] palsB, int parejas, string desc)
     {
         nombres = palsA;
         verbos = palsB;
         this.parejas = parejas;
+        Descripcion = desc;
     }
 }
 
@@ -53,23 +55,27 @@ public class SecuenciasAcciones{
              new Secuencia(
                 new string[]{"coger", "tirar"},
                 new string[]{"palanca", "palanca"},
-                1),
+                1,
+                "¡Una palanca! Parece que abre una puerta..."),
             
             //encender antorcha
             new Secuencia(
                 new string[]{"prender", "acercar", "encender"},
                 new string[]{"fuego", "antorcha", "antorcha"},
-                2),
+                2,
+                "Está todo muy oscuro. Suerte que llevo mi antorcha."),
             //abrir puerta
             new Secuencia(
                 new string[]{"portal", "pomo", "pomo", "puerta", "escalera", "visillo"},
                 new string[]{"acercarse", "coger", "girar", "empujar", "golpear", "sacar"},
-                3),
-            //sacar DNI
+                3,
+                "Seguro que hay algo interesante tras esa puerta; ¡debo abrirla!"),
+            //enfundar espada
              new Secuencia(
-                new string[]{"cartera", "cartera", "DNI", "DNI", "DNI", "tarjeta", "carné", "monedas", "bolsillo"},
-                new string[]{"sacar", "abrir", "buscar", "coger", "sacar", "contar", "observar", "leer"},
-                4),
+                new string[]{"espada", "funda", "espada", "espada", "funda", "daga", "antorcha", "monedas", "bolsillo"},
+                new string[]{"coger", "coger", "girar", "meter", "sacar", "contar", "observar", "leer"},
+                4
+                ,"¡Una espada! Será mejor que la guarde."),
 
         };
 
