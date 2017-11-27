@@ -12,7 +12,7 @@ public class GestorParejas : MonoBehaviour {
     public float yInicialVerbos, yInicialNombres;
     public float incrementoX, incrementoY;
     public int numeroPanelesPorFila;
-	public Text TextMision, TextRey;
+	public Text TextMision, TextRey, TextContador;
 
     bool panelCogido; //inica si hay un panel cogido
     SecuenciasAcciones secuencias;
@@ -38,9 +38,10 @@ public class GestorParejas : MonoBehaviour {
 
     //texto base para mostrar parejas ya hechas
     GameObject textoSecuenciaBase;
+        
 
-	// Use this for initialization
-	void Awake () {
+    // Use this for initialization
+    void Awake () {
         secuencias = SecuenciasAcciones.Getinstance();
 
         //soportes palabras
@@ -222,6 +223,8 @@ public class GestorParejas : MonoBehaviour {
         }
 
         TextMision.text = secuenciaActiva.Descripcion;
+        TextRey.text = secuenciaActiva.Ayuda;
+        TextContador.text = "ACCIONES RESTANTES\n " + misionActual + "/" + secuencias.Secuencias.Length;
     }
 
 

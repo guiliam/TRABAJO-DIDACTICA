@@ -32,16 +32,17 @@ public struct Secuencia
 
     public string[] nombres;
     public string[] verbos;
-    public string Descripcion;
+    public string Descripcion, Ayuda;
 
     public int parejas;
 
-    public Secuencia(string[] palsA, string[] palsB, int parejas, string desc)
+    public Secuencia(string[] palsA, string[] palsB, int parejas, string desc, string ayuda)
     {
         nombres = palsA;
         verbos = palsB;
         this.parejas = parejas;
         Descripcion = desc;
+        Ayuda = ayuda;
     }
 }
 
@@ -56,26 +57,30 @@ public class SecuenciasAcciones{
                 new string[]{"coger", "tirar"},
                 new string[]{"palanca", "palanca"},
                 1,
-                "¡Una palanca! Parece que abre una puerta..."),
+                "TIRA DE LA PALANCA",
+                "VAYA, HAY UNA PALANCA. UNE LAS ACCIONES CON LOS OBJETOS PARA ACCIONARLA, A VER QUE PASA"),
             
             //encender antorcha
             new Secuencia(
                 new string[]{"prender", "acercar", "encender"},
                 new string[]{"fuego", "antorcha", "antorcha"},
                 2,
-                "Está todo muy oscuro. Suerte que llevo mi antorcha."),
+                "ILUMINA EL LUGAR.",
+                "TODO ESTA MUY OSCURO, PRUEBA A HACER LO MISMO DE ANTES A VER SI PODEMOS VER ALGO"),
             //abrir puerta
             new Secuencia(
                 new string[]{"portal", "pomo", "pomo", "puerta", "escalera", "visillo"},
                 new string[]{"acercarse", "coger", "girar", "empujar", "golpear", "sacar"},
                 3,
-                "Seguro que hay algo interesante tras esa puerta; ¡debo abrirla!"),
+                "ABRE LA PUERTA",
+                "VEAMOS QUE HAY DETRAS DE LA PUERTA... LLEVA CUIDADO, VEO ACCIONES Y OBJETOS QUE NO SIRVEN AQUI"),
             //enfundar espada
              new Secuencia(
-                new string[]{"espada", "funda", "espada", "espada", "funda", "daga", "antorcha", "monedas", "bolsillo"},
-                new string[]{"coger", "coger", "girar", "meter", "sacar", "contar", "observar", "leer"},
+                new string[]{"espada", "funda", "espada", "funda", "daga", "antorcha", "monedas", "bolsillo"},
+                new string[]{"coger", "coger", "meter", "guardar", "contar", "observar", "leer"},
                 4
-                ,"¡Una espada! Será mejor que la guarde."),
+                ,"HAZTE CON UN ARMA",
+                 "UNA ESPADA! PUEDE QUE LUEGO NOS SEA UTIL"),
 
         };
 
