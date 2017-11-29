@@ -44,7 +44,7 @@ public class GestorBombillas : MonoBehaviour {
 		if (finDelJuego) {
 			CanvasFinal.SetActive (true);
 			timeAux += Time.deltaTime;
-			if (timeAux >= 4)
+			if (timeAux >= 8)
 				Application.LoadLevel ("UnirPalabras");
 		}
 	}

@@ -248,11 +248,15 @@ public class GestorParejas : MonoBehaviour {
             ////CODIGO VICTORIA AQUI
             //carrying.GetComponent<MovimientoPalabra>().Liberar();
             indiceSecuenciaActiva++;
+            if (indiceSecuenciaActiva >= secuencias.Secuencias.Length)
+            {                
+                Application.LoadLevel("GeneradorCodigoAleatorio");
+            }
             secuenciaActiva = secuencias.Secuencias[indiceSecuenciaActiva];
             cargarSecuencia();
 			//cambiar dialogo y mision
 			misionActual++;
-			fraseReyActual++;
+			fraseReyActual++;            
             //borrar parejas hechas
             for (int i = canvasSecuencia.transform.GetChildCount() - 1; i > 0; i--)
             {

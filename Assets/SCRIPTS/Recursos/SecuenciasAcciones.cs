@@ -78,7 +78,7 @@ public class SecuenciasAcciones{
              new Secuencia(
                 new string[]{"espada", "funda", "espada", "funda", "daga", "antorcha", "monedas", "bolsillo"},
                 new string[]{"coger", "coger", "meter", "guardar", "contar", "observar", "leer"},
-                4
+                3
                 ,"HAZTE CON UN ARMA",
                  "UNA ESPADA! PUEDE QUE LUEGO NOS SEA UTIL"),
 

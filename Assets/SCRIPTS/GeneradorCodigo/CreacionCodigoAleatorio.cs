@@ -8,7 +8,16 @@ using UnityEngine.UI;
 
 public class CreacionCodigoAleatorio : MonoBehaviour {
 
+    public string[] FrasesRey;
+    public Text TextRey;
+    public Text TextAciertos;
+    public GameObject CanvasFinal;
     private const int TOTAL_BOTONES_SOLUCION = 8;
+
+    private int aciertosTotales = 0;
+
+    bool finDelJuego = false;
+    float timeAux = 0;
 
     //TIPOS DE LINEA
     private const int LINEA_NORMAL = 0;
@@ -173,6 +182,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     #region FUNCIONES UNITY
     void Awake()
     {
+        TextRey.text = FrasesRey[aciertosTotales];
         soporteCodigo = GameObject.Find("SoporteCodigo").GetComponent<Text>();
         textoPregunta = GameObject.Find("TextoPregunta").GetComponent<Text>();
         botonesSolucion = new GameObject[TOTAL_BOTONES_SOLUCION];
@@ -587,6 +597,20 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         //elegimos el boton con la respuesta correcta
         GameObject.Find("Boton" + botonCorrecto).GetComponentInChildren<Text>().text = Convert.ToString(valoresVariables[indiceVariable]);
         this.botonCorrecto = botonCorrecto;
+
+
+
+    }
+
+    private void Update()
+    {
+        if (finDelJuego)
+        {
+            CanvasFinal.SetActive(true);
+            timeAux += Time.deltaTime;
+            if (timeAux >= 4)
+                Application.LoadLevel("CinematicaFinal");
+        }
     }
 
     private void prepararPregunta(int variableParaPreguntar)
@@ -598,9 +622,22 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         if (boton == botonCorrecto)
         {
-            print("acierto");
-            aciertos++;
-            nuevoCodigo();
+            //indicar correcto o incorrecto y suma acierto. Cuando llegue a 30 aciertos consecutivos o no consecutivo, 
+            //acaba el juego, así la dificultad se adapta al jugadoooore
+            aciertosTotales++;
+            if (aciertosTotales >= 30)
+            {
+                finDelJuego = true;
+            }
+            try
+            {
+                TextRey.text = FrasesRey[aciertosTotales];
+                TextAciertos.text = "ACIERTOS\n" + aciertosTotales + "/30";
+                print("acierto");
+                aciertos++;
+                nuevoCodigo();
+            }
+            catch (Exception e) { }
         }
 
         else

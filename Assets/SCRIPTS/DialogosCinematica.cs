@@ -23,44 +23,54 @@ public class DialogosCinematica : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (contador < frases.Length) {
+        if (contador < frases.Length)
+        {
 
-			if (contador == 1) {
-				PersonajeEntero.SetActive (true);
-			}
+            if (contador == 1)
+            {
+                PersonajeEntero.SetActive(true);
+            }
 
-			if (contador == 4) {
-				PersonajeEntero.SetActive (false);
-				PersonajeSinPiernas.SetActive (true);
-				BocadilloTexto.SetActive (true);
-			}
+            if (contador == 4)
+            {
+                PersonajeEntero.SetActive(false);
+                PersonajeSinPiernas.SetActive(true);
+                BocadilloTexto.SetActive(true);
+            }
 
-			if (contador == 5) {
-				PersonajeSinPiernas.SetActive (false);
-				PersonajeSinBrazos.SetActive (true);
-			}
+            if (contador == 5)
+            {
+                PersonajeSinPiernas.SetActive(false);
+                PersonajeSinBrazos.SetActive(true);
+            }
 
-			if (Input.GetKeyDown ("space")) {
-				Hoja.SetActive (false);
-				contarTiempoTexto = true;
-				audio.Play ();
+            if (Input.GetKeyDown("space"))
+            {
+                Hoja.SetActive(false);
+                contarTiempoTexto = true;
+                audio.Play();
 
-			}
+            }
 
-			if (Hoja.activeSelf == false) {
-				Hoja.SetActive (true);
+            if (Hoja.activeSelf == false)
+            {
+                Hoja.SetActive(true);
 
-			}
+            }
 
-			if (contarTiempoTexto) {
-				tiempo += Time.deltaTime;
-				if (tiempo > 1) {
-					contador++;
-					texto.text = frases [contador];
-					tiempo = 0;
-					contarTiempoTexto = false;
-				}
-			}
-		}
+            if (contarTiempoTexto)
+            {
+                tiempo += Time.deltaTime;
+                if (tiempo > 1)
+                {
+                    contador++;
+                    texto.text = frases[contador];
+                    tiempo = 0;
+                    contarTiempoTexto = false;
+                }
+            }
+        }
+        else
+            Application.LoadLevel("LucesBombillas");
 	}
 }
