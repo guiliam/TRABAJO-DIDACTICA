@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GestorParejas : MonoBehaviour {
 
-    private const float INCREMENTO_VERTICAL_TEXTO_PAREJAS_RESUELTAS = 10F;
+    private const float INCREMENTO_VERTICAL_TEXTO_PAREJAS_RESUELTAS = 7F;
 
     public float xInicial;
     public float yInicialVerbos, yInicialNombres;
@@ -209,7 +209,7 @@ public class GestorParejas : MonoBehaviour {
             posicionExtraida = listaPosAux[UnityEngine.Random.Range(0, listaPosAux.Count - 1)];
             listaPosAux.Remove(posicionExtraida);
             panelesNombresActivos[i].transform.localPosition = new Vector3(xInicial + (posicionExtraida % numeroPanelesPorFila * incrementoX),
-                                                       yInicialNombres - (incrementoY * (posicionExtraida / numeroPanelesPorFila)), -2f);
+                                                       yInicialNombres - (incrementoY/2 * (posicionExtraida / numeroPanelesPorFila)), -2f);
             panelesNombresActivos[i].GetComponent<MovimientoPalabra>().SetPosInicial(panelesNombresActivos[i].transform.position);
         }
 
@@ -218,13 +218,13 @@ public class GestorParejas : MonoBehaviour {
 			posicionExtraida = listaPosAux[UnityEngine.Random.Range(0, listaPosAux.Count - 1)];
             listaPosAux.Remove(posicionExtraida);
             panelesVerbosActivos[i].transform.localPosition = new Vector3(xInicial + (posicionExtraida % numeroPanelesPorFila * incrementoX),
-                                                       yInicialNombres - (incrementoY * (posicionExtraida / numeroPanelesPorFila)), -2f);
+				yInicialNombres - (incrementoY/2 * (posicionExtraida / numeroPanelesPorFila)), -2f);
             panelesVerbosActivos[i].GetComponent<MovimientoPalabra>().SetPosInicial(panelesVerbosActivos[i].transform.position);
         }
 
         TextMision.text = secuenciaActiva.Descripcion;
         TextRey.text = secuenciaActiva.Ayuda;
-        TextContador.text = "ACCIONES RESTANTES\n " + misionActual + "/" + secuencias.Secuencias.Length;
+        TextContador.text = "ACCIONES COMPLETADAS\n " + misionActual + "/" + secuencias.Secuencias.Length;
     }
 
 
@@ -233,7 +233,7 @@ public class GestorParejas : MonoBehaviour {
         GameObject nuevoTexto = GameObject.Instantiate(textoSecuenciaBase);
         nuevoTexto.SetActive(true);
         nuevoTexto.transform.SetParent(canvasSecuencia.transform);
-		nuevoTexto.GetComponent<Text>().text = secuenciaActiva.nombres[parejaActual] + " " + secuenciaActiva.verbos[parejaActual];
+		nuevoTexto.GetComponent<Text>().text = secuenciaActiva.verbos[parejaActual] + " " + secuenciaActiva.nombres[parejaActual];
         nuevoTexto.transform.localPosition = new Vector3(textoSecuenciaBase.transform.localPosition.x, textoSecuenciaBase.transform.localPosition.y - INCREMENTO_VERTICAL_TEXTO_PAREJAS_RESUELTAS * parejaActual,
             textoSecuenciaBase.transform.localPosition.z);
         nuevoTexto.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);

@@ -54,16 +54,16 @@ public class SecuenciasAcciones{
         {
             //tirar palanca
              new Secuencia(
-                new string[]{"coger", "tirar"},
-                new string[]{"palanca", "palanca"},
+			new string[]{"palanca", "palanca"},
+			new string[]{"coger", "tirar"},
                 1,
                 "TIRA DE LA PALANCA",
                 "VAYA, HAY UNA PALANCA. UNE LAS ACCIONES CON LOS OBJETOS PARA ACCIONARLA, A VER QUE PASA"),
             
             //encender antorcha
             new Secuencia(
-                new string[]{"prender", "acercar", "encender"},
-                new string[]{"fuego", "antorcha", "antorcha"},
+			new string[]{"fuego", "antorcha", "antorcha"},
+			new string[]{"prender", "acercar", "encender"},
                 2,
                 "ILUMINA EL LUGAR.",
                 "TODO ESTA MUY OSCURO, PRUEBA A HACER LO MISMO DE ANTES A VER SI PODEMOS VER ALGO"),
@@ -81,6 +81,20 @@ public class SecuenciasAcciones{
                 3
                 ,"HAZTE CON UN ARMA",
                  "UNA ESPADA! PUEDE QUE LUEGO NOS SEA UTIL"),
+			//matar un dragon
+			new Secuencia(
+				new string[]{"espada", "espada", "dragon", "dragon", "daga", "colmillos", "mordisco"},
+				new string[]{"empuñar", "desenfundar", "atacar", "matar", "esquivar", "cortar", "huir"},
+				3
+				,"¡UN DRAGON! ",
+				"¡RAPIDO! ¡DESENFUNDA!"),
+		//buscar un libro
+		new Secuencia(
+			new string[]{"estanteria", "libro", "libro", "indice", "capitulo", "capitulo", "mordisco"},
+			new string[]{"acercar", "buscar", "coger", "mirar", "buscar", "leer", "huir", "quemar"},
+			5
+			,"BUSCA EN EL LIBRO",
+			"SEGURO QUE HAY UN LIBRO QUE ME SIRVA PARA SAKIR DE AQUI"),
 
         };
 

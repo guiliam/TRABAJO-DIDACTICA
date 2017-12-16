@@ -5,7 +5,7 @@ using UnityEngine;
 public class MovimientoPalabra : MonoBehaviour {
 
     private const float DISTANCE_TO_CAMERA = 7.5f;
-    private const float DISTANCE_STICK = 15f;
+    private const float DISTANCE_STICK = 13f;
     private const float OFFSET_POSICION = 20;
     private const float VELOCIDAD_VUELTA = 50f;
     private const float MARGEN_POSICION_INICIAL = 0.1f;

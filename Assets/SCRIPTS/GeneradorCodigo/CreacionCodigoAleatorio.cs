@@ -568,7 +568,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     {
         int indiceVariable = UnityEngine.Random.Range(0, identificadoresVariables.Count);
         prepararPregunta(indiceVariable);
-        int botonCorrecto =  UnityEngine.Random.Range(0, dificultad + 1);
+        int botonCorrecto =  UnityEngine.Random.Range(0, dificultad + 2);
         List<int> aux = new List<int>();
 
         for(int i = valoresVariables[indiceVariable] - 20 ; i < valoresVariables[indiceVariable] + 20; i++)
@@ -625,14 +625,14 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
             //indicar correcto o incorrecto y suma acierto. Cuando llegue a 30 aciertos consecutivos o no consecutivo, 
             //acaba el juego, así la dificultad se adapta al jugadoooore
             aciertosTotales++;
-            if (aciertosTotales >= 30)
+            if (aciertosTotales >= 10)
             {
                 finDelJuego = true;
             }
             try
             {
                 TextRey.text = FrasesRey[aciertosTotales];
-                TextAciertos.text = "ACIERTOS\n" + aciertosTotales + "/30";
+                TextAciertos.text = "ACIERTOS\n" + aciertosTotales + "/10";
                 print("acierto");
                 aciertos++;
                 nuevoCodigo();
