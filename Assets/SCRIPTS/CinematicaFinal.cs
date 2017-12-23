@@ -39,7 +39,7 @@ public class CinematicaFinal : MonoBehaviour {
 			}
 
 
-			if (contador > 12) {
+			if (contador == 12) {
 				Application.Quit ();
 				print ("ADIOS");
 			}
