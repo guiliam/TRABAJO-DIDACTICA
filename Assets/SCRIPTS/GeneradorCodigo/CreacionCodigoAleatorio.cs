@@ -8,24 +8,6 @@ using UnityEngine.UI;
 
 public class CreacionCodigoAleatorio : MonoBehaviour {
 
-    public string[] FrasesRey;
-    public Text TextRey;
-    public Text TextAciertos;
-    public GameObject CanvasFinal;
-    private const int TOTAL_BOTONES_SOLUCION = 8;
-
-    private int aciertosTotales = 0;
-
-    bool finDelJuego = false;
-    float timeAux = 0;
-
-    //TIPOS DE LINEA
-    private const int LINEA_NORMAL = 0;
-    private const int LINEA_CONDICION = 1;
-    private const int BUCLE_WHILE = 2;
-    private const int BUCLE_FOR = 3;
-    List<int> listaReferenciaTiposLineas = new List<int>(new int[] {0,1,2,3});
-
     struct operacion
     {
         int operador; //indice del operador
@@ -118,13 +100,16 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         }
     }
 
+    private const float VELOCIDAD_APARICION_DESAPARICION_TEXTO_ACIERTO = 0.7f;
+    private const string TEXTO_CORRECTO = "CORRECTO";
+    private const string TEXTO_FALLO = "HAS FALLADO";
+
     public const int MUY_FACIL = 0;
     public const int FACIL = 1;
     //aparecen condiciones
     public const int MEDIO = 2;
     //bucles while
     public const int MEDIO_DIFICIL = 3;
-    //bucles for
     public const int DIFICIL = 4;
     //bucles anidados
     public const int MUY_DIFICIL = 5;
@@ -148,6 +133,24 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     private int operadoresAdmitidos;
     private int numeroDeVariables;
     private bool operadoresReducidos; //decide si podran usarse operadores como +=, -=, etc.
+
+    public string[] FrasesRey;
+    public Text TextRey;
+    public Text TextAciertos;
+    public GameObject CanvasFinal;
+    private const int TOTAL_BOTONES_SOLUCION = 8;
+
+    private int aciertosTotales = 0;
+
+    bool finDelJuego = false;
+    float timeAux = 0;
+
+    //TIPOS DE LINEA
+    private const int LINEA_NORMAL = 0;
+    private const int LINEA_CONDICION = 1;
+    private const int BUCLE_WHILE = 2;
+    private const int BUCLE_FOR = 3;
+    List<int> listaReferenciaTiposLineas = new List<int>(new int[] { 0, 1, 2, 3 });
 
     int tabuladores;
     int aciertos;
@@ -177,11 +180,17 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     //almacena el codigo creado
     List<operacion> operaciones = new List<operacion>();
 
+    //texto aciertos - error
+    Text textoAcierto;
+
+    //mostrar tutorial
+    TutorialesCodigo tutos;
 
 
     #region FUNCIONES UNITY
     void Awake()
     {
+        tutos = GetComponent<TutorialesCodigo>();
         TextRey.text = FrasesRey[aciertosTotales];
         soporteCodigo = GameObject.Find("SoporteCodigo").GetComponent<Text>();
         textoPregunta = GameObject.Find("TextoPregunta").GetComponent<Text>();
@@ -193,26 +202,35 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         }
 
 
+        textoAcierto = GameObject.Find("TextoAcierto").GetComponent<Text>();
         nuevoCodigo();
-        
     }
 
     private void nuevoCodigo()
     {
         //limpia las variables
         inicializarVariablesRelacionadasConCodigo();
-
-        if (aciertos < 3)
+        tutos.MostrarTutorial(TutorialesCodigo.TUTORIAL_ASIGNACIONES);
+        if (aciertos < 2)
             dificultad = MUY_FACIL;
-        else if (aciertos < 7)
+        else if (aciertos < 4)
+        {
+            tutos.MostrarTutorial(TutorialesCodigo.TUTORIAL_OPERADORES);
             dificultad = FACIL;
-        else if (aciertos < 11)
+        }
+        else if (aciertos < 6)
+        {
+            tutos.MostrarTutorial(TutorialesCodigo.TUTORIAL_CONDICIONALES);
             dificultad = MEDIO;
-        else if (aciertos < 16)
+        }
+        else if (aciertos < 8)
+        {
+            tutos.MostrarTutorial(TutorialesCodigo.TUTORIAL_BUCLES);
             dificultad = MEDIO_DIFICIL;
-        else if (aciertos < 21)
+        }
+        else if (aciertos < 12)
             dificultad = DIFICIL;
-        else if (aciertos < 30)
+        else if (aciertos < 14)
             dificultad = MUY_DIFICIL;
             
 
@@ -625,6 +643,7 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
             //indicar correcto o incorrecto y suma acierto. Cuando llegue a 30 aciertos consecutivos o no consecutivo, 
             //acaba el juego, así la dificultad se adapta al jugadoooore
             aciertosTotales++;
+            textoAcierto.text = TEXTO_CORRECTO;
             if (aciertosTotales >= 10)
             {
                 finDelJuego = true;
@@ -643,9 +662,44 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
         else
         {
             print("error");
+            textoAcierto.text = TEXTO_FALLO;
             aciertos -= 2;
             nuevoCodigo();
         }
+        StopCoroutine("AparicionYDesaparicionTextoAcierto");
+        StartCoroutine("AparicionYDesaparicionTextoAcierto");
+    }
+
+    IEnumerator AparicionYDesaparicionTextoAcierto()
+    {
+        Color colorActu;
+        colorActu = textoAcierto.color;
+
+        //se hace aparecer poco a poco
+        while (textoAcierto.color.a < 0.95f)
+        {
+            colorActu.a += VELOCIDAD_APARICION_DESAPARICION_TEXTO_ACIERTO * Time.deltaTime;
+            textoAcierto.color = colorActu;
+            yield return null;
+        }
+        //aparicion total
+        colorActu.a = 1;
+        textoAcierto.color = colorActu;
+
+        yield return new WaitForSeconds(1);
+
+        //se hace desaparecer poco a poco
+        while (textoAcierto.color.a > 0.05f)
+        {
+            colorActu.a -= VELOCIDAD_APARICION_DESAPARICION_TEXTO_ACIERTO * Time.deltaTime;
+            textoAcierto.color = colorActu;
+            yield return null;
+        }
+        //desaparicion total
+        colorActu.a = 0;
+        textoAcierto.color = colorActu;
+
+        yield return null;
     }
 
     #region GENERADORES LINEAS
@@ -958,42 +1012,50 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
 
     public void OnClickBoton0()
     {
-        comprobarAcierto(0);
+        if(!tutos.HayTutorialActivo())
+            comprobarAcierto(0);
     }
 
     public void OnClickBoton1()
     {
-        comprobarAcierto(1);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(1);
     }
 
     public void OnClickBoton2()
     {
-        comprobarAcierto(2);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(2);
     }
 
     public void OnClickBoton3()
     {
-        comprobarAcierto(3);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(3);
     }
 
     public void OnClickBoton4()
     {
-        comprobarAcierto(4);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(4);
     }
 
     public void OnClickBoton5()
     {
-        comprobarAcierto(5);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(5);
     }
 
     public void OnClickBoton6()
     {
-        comprobarAcierto(6);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(6);
     }
 
     public void OnClickBoton7()
     {
-        comprobarAcierto(7);
+        if (!tutos.HayTutorialActivo())
+            comprobarAcierto(7);
     }
 
     #endregion
@@ -1010,4 +1072,5 @@ public class CreacionCodigoAleatorio : MonoBehaviour {
     }
 
     #endregion
+
 }

@@ -12,7 +12,7 @@ public class GestorParejas : MonoBehaviour {
     public float yInicialVerbos, yInicialNombres;
     public float incrementoX, incrementoY;
     public int numeroPanelesPorFila;
-	public Text TextMision, TextRey, TextContador;
+	public Text TextMision, TextRey, TextContador, TextPistas;
 
     bool panelCogido; //inica si hay un panel cogido
     SecuenciasAcciones secuencias;
@@ -89,6 +89,9 @@ public class GestorParejas : MonoBehaviour {
                 panelCogido = false;
                 carrying = null;
                 parejaActual++;
+                //actualizamos pista
+                if(parejaActual < secuenciaActiva.pistas.Length)
+                    TextPistas.text = secuenciaActiva.pistas[parejaActual];
                 comprobarVictoria();
                 return true;
             }
@@ -110,6 +113,9 @@ public class GestorParejas : MonoBehaviour {
                 panelCogido = false;
                 carrying = null;
                 parejaActual++;
+                //actualizamos pista
+                if (parejaActual < secuenciaActiva.pistas.Length)
+                    TextPistas.text = secuenciaActiva.pistas[parejaActual];
                 comprobarVictoria();
                 return true;
             }
@@ -224,7 +230,10 @@ public class GestorParejas : MonoBehaviour {
 
         TextMision.text = secuenciaActiva.Descripcion;
         TextRey.text = secuenciaActiva.Ayuda;
-        TextContador.text = "ACCIONES COMPLETADAS\n " + misionActual + "/" + secuencias.Secuencias.Length;
+        TextContador.text = "ACCIONES COMPLETADAS\n " + (misionActual + 1) + "/" + secuencias.Secuencias.Length;
+
+        //actualizamos pista
+        TextPistas.text = secuenciaActiva.pistas[0];
     }
 
 
@@ -251,6 +260,7 @@ public class GestorParejas : MonoBehaviour {
             if (indiceSecuenciaActiva >= secuencias.Secuencias.Length)
             {                
                 Application.LoadLevel("GeneradorCodigoAleatorio");
+                return;
             }
             secuenciaActiva = secuencias.Secuencias[indiceSecuenciaActiva];
             cargarSecuencia();

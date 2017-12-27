@@ -25,6 +25,7 @@ public class MovimientoPalabra : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+
         //si esta cogido
         if (cogido)
         {
@@ -49,7 +50,7 @@ public class MovimientoPalabra : MonoBehaviour {
                     //si esta lo bastante cerca, se pega
                     if (aux <= DISTANCE_STICK)
                     {
-                        print("Cerca");
+                        //print("Cerca");
                         //si ya habia un candidato, se coge el mas ceracno
                         if (aux < distanciaCandidato)
                         {
