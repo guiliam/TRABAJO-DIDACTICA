@@ -38,7 +38,29 @@ public class GestorParejas : MonoBehaviour {
 
     //texto base para mostrar parejas ya hechas
     GameObject textoSecuenciaBase;
-        
+	public GameObject CanvasNivelCompletado, CanvasFinal;
+	float timeAux;
+	bool completado, finDelJuego;
+
+	void Update(){
+		if (indiceSecuenciaActiva >= secuencias.Secuencias.Length) {
+			CanvasNivelCompletado.SetActive (true);
+		}
+		if (completado) {
+			timeAux += Time.deltaTime;
+		}
+		if(timeAux > 3 && !finDelJuego){
+			timeAux = 0;
+			cargarSecuencia ();
+			completado = false;
+		}
+		if (finDelJuego) {
+			CanvasFinal.SetActive (true);
+			timeAux += Time.deltaTime;
+			if (timeAux >= 8)
+				Application.LoadLevel ("GeneradorCodigoAleatorio");
+		}
+	}
 
     // Use this for initialization
     void Awake () {
@@ -134,6 +156,8 @@ public class GestorParejas : MonoBehaviour {
 
     void cargarSecuencia()
     {
+		completado = false;
+		CanvasNivelCompletado.SetActive (false);
         GameObject aux;
         List<int> listaPosAux = new List<int>(); //para mezclar los paneles
         int ultimoIndiceNombres;
@@ -250,20 +274,23 @@ public class GestorParejas : MonoBehaviour {
 
 
     private void comprobarVictoria()
-    {
+    {		
         if (parejaActual >= secuenciaActiva.parejas + 1)
         {
+			completado = true;
             print("NIVEL COMPLETADO");
+			CanvasNivelCompletado.SetActive (true);
             ////CODIGO VICTORIA AQUI
             //carrying.GetComponent<MovimientoPalabra>().Liberar();
             indiceSecuenciaActiva++;
             if (indiceSecuenciaActiva >= secuencias.Secuencias.Length)
             {                
-                Application.LoadLevel("GeneradorCodigoAleatorio");
+                //Application.LoadLevel("GeneradorCodigoAleatorio");
+				finDelJuego = true;
                 return;
             }
             secuenciaActiva = secuencias.Secuencias[indiceSecuenciaActiva];
-            cargarSecuencia();
+            //cargarSecuencia();
 			//cambiar dialogo y mision
 			misionActual++;
 			fraseReyActual++;            
