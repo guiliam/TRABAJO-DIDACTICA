@@ -7,12 +7,16 @@ using UnityEngine.UI;
 public class GestorParejas : MonoBehaviour {
 
     private const float INCREMENTO_VERTICAL_TEXTO_PAREJAS_RESUELTAS = 7F;
+    private const float POSICION_Y_DESAPARICION_IMAGEN_TUTORIAL = -1055f;
+    private const float VELOCIDAD_MOVIMIENTO_IMAGEN_TUTO = 400f;
+    private const float TIEMPO_PARA_PODER_PASAR_TUTORIAL = 4F;
 
     public float xInicial;
     public float yInicialVerbos, yInicialNombres;
     public float incrementoX, incrementoY;
     public int numeroPanelesPorFila;
 	public Text TextMision, TextRey, TextContador, TextPistas;
+    public GameObject imagenTuto;
 
     bool panelCogido; //inica si hay un panel cogido
     SecuenciasAcciones secuencias;
@@ -39,10 +43,18 @@ public class GestorParejas : MonoBehaviour {
     //texto base para mostrar parejas ya hechas
     GameObject textoSecuenciaBase;
 	public GameObject CanvasNivelCompletado, CanvasFinal;
-	float timeAux;
-	bool completado, finDelJuego;
+	float timeAux, tiempoInicioEscena;
+	bool completado, finDelJuego, tutoMostrandose;
 
 	void Update(){
+
+        //si el tutorial se esta mostrando, lo apartamos
+        if (tutoMostrandose && Input.GetKeyDown(KeyCode.Space) && Time.time - tiempoInicioEscena > TIEMPO_PARA_PODER_PASAR_TUTORIAL)
+        {
+            StartCoroutine("DesaparicionImagenTutorial");
+            tutoMostrandose = false;
+        }
+
 		if (indiceSecuenciaActiva >= secuencias.Secuencias.Length) {
 			CanvasNivelCompletado.SetActive (true);
 		}
@@ -64,6 +76,7 @@ public class GestorParejas : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
+        tiempoInicioEscena = Time.time;
         secuencias = SecuenciasAcciones.Getinstance();
 
         //soportes palabras
@@ -89,6 +102,8 @@ public class GestorParejas : MonoBehaviour {
         panelesVerbosActivos = new List<GameObject>();
 
         cargarSecuencia();
+
+        tutoMostrandose = true;
 	}
 
     public bool ComprobarPareja(GameObject obj1)
@@ -336,5 +351,22 @@ public class GestorParejas : MonoBehaviour {
     public GameObject GetCarriying()
     {
         return carrying;
+    }
+
+
+    IEnumerator DesaparicionImagenTutorial()
+    {
+        Vector3 aux;
+
+        while (imagenTuto.transform.localPosition.y > POSICION_Y_DESAPARICION_IMAGEN_TUTORIAL)
+        {
+            aux = imagenTuto.transform.localPosition;
+            aux.y -= Time.deltaTime * VELOCIDAD_MOVIMIENTO_IMAGEN_TUTO;
+            imagenTuto.transform.localPosition = aux;
+            yield return null;
+        }
+
+        imagenTuto.SetActive(false);
+
     }
 }

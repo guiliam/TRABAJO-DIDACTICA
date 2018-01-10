@@ -101,7 +101,7 @@ public class SecuenciasAcciones{
                  "UNA ESPADA! PUEDE QUE LUEGO NOS SEA UTIL",
                   new string[] {"LA ESPADA ESTA EN EL SUELO", "TENGO LA ESPADA, PERO NECESITO ALGO PARA GUARDARLA",
                   "VALE, YA TENGO UNA FUNDA",
-                  "LA ESPADA ESTA DENTRO, QUE HAGO OCN LA FUNDA?"}),
+                  "LA ESPADA ESTA DENTRO, QUE HAGO CON LA FUNDA?"}),
 			//matar un dragon
 			new Secuencia(
 				new string[]{"espada", "espada", "dragon", "garra", "dragon", "colmillos", "mordisco"},

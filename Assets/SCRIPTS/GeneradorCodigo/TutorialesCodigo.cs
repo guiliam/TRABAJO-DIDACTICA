@@ -35,7 +35,7 @@ public class TutorialesCodigo : MonoBehaviour {
 	void Awake () {
         imagenTutoriales = GameObject.Find("ImagenSoporteTutoriales").GetComponent<Image>();
         soporteTutoriales = GameObject.Find("SoporteTutoriales");
-        posInicial = soporteTutoriales.transform.position;
+        posInicial = soporteTutoriales.transform.localPosition;
         posEscondido = new Vector3(posInicial.x, posInicial.y -3000, posInicial.z);
 	}
 
